@@ -1,0 +1,32 @@
+[
+  {
+    "username": "dorm2",
+    "password": "WDx9h9pV",
+    "campus": "南校区",
+    "building": "2号楼"
+  },
+  {
+    "username": "dorm3",
+    "password": "cJ8zFz7u",
+    "campus": "南校区",
+    "building": "3号楼"
+  },
+  {
+    "username": "dorm4",
+    "password": "zgMkMJWu",
+    "campus": "南校区",
+    "building": "4号楼"
+  },
+  {
+    "username": "dorm5",
+    "password": "8DuD48Eq",
+    "campus": "南校区",
+    "building": "5号楼"
+  },
+  {
+    "username": "dorm1",
+    "password": "12345678",
+    "campus": "南校区",
+    "building": "1号楼"
+  }
+]

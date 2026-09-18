@@ -1,0 +1,32 @@
+/* 学生报修表单与照片展示 */
+
+.repair-form {
+  display: grid;
+  gap: 16px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.image-placeholder,
+.repair-image {
+  margin-top: 12px;
+  width: 100%;
+  max-width: 260px;
+  min-height: 120px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.repair-image {
+  object-fit: cover;
+  display: block;
+  background: #f1f5f9;
+}

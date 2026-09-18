@@ -1,0 +1,110 @@
+/* 报修工单：筛选栏、工单卡片、处理与删除按钮 */
+
+/* 工单筛选栏：按校区 / 楼号 / 时间 / 状态区分工单 */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.filter-field {
+  display: grid;
+  gap: 6px;
+  flex: 0 0 150px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.filter-field select {
+  padding: 9px 10px;
+}
+
+/* 楼号筛选未选校区时禁用，与报修表单的「请先选择校区」一致 */
+.filter-field select:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.filter-summary {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.record-list {
+  display: grid;
+  gap: 16px;
+}
+
+.record-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+  padding: 18px;
+}
+
+.record-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.record-card p {
+  margin: 8px 0;
+  color: #475569;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status.done {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.manager-card {
+  background: #ffffff;
+}
+
+.manager-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.manager-actions button.danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.manager-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

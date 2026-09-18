@@ -1,0 +1,385 @@
+/* 全局基础样式：设计变量、重置、页面骨架、顶栏、通用表单控件、按钮、提示条、确认对话框 */
+
+:root {
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #1f2937;
+  background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  min-height: 100%;
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 24px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.95);
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+.topbar .brand { color: #fff; }
+
+.topbar { position: relative; }
+.topbar-return {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+}
+.topbar-return:hover { background: rgba(255,255,255,0.12); }
+
+.brand {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: default;
+}
+
+/* 密码输入框与「显示/隐藏」眼睛按钮：登录页与修改密码对话框共用 */
+.pwd-wrapper {
+  position: relative;
+}
+.pwd-input {
+  width: 100%;
+  padding-right: 44px; /* space for the eye button */
+}
+.toggle-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #0b1220;
+}
+.toggle-eye svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+.toggle-eye:hover {
+  color: #03060a;
+}
+.toggle-eye:focus {
+  outline: none;
+}
+
+/* .nav removed per user request */
+.nav { display: none; }
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.nav a.active,
+.nav a:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.main-content {
+  margin-top: 24px;
+}
+
+.page {
+  display: block;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  color: #334155;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 11px 12px;
+  background: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* lighter placeholder color for all inputs/textareas/selects */
+input::placeholder,
+textarea::placeholder {
+  color: rgba(31, 41, 55, 0.45);
+}
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: rgba(31, 41, 55, 0.45);
+}
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: rgba(31, 41, 55, 0.45);
+}
+select option[value=""] {
+  color: rgba(31, 41, 55, 0.45);
+}
+
+.primary-btn,
+.search-box button,
+.manager-actions button {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 16px;
+  color: white;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  font-weight: 600;
+}
+
+/* 次要按钮：用于「修改」这类进入编辑态的操作，与蓝底主按钮「保存」区分开 */
+.secondary-btn {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 11px 16px;
+  color: #334155;
+  background: #ffffff;
+  font-weight: 600;
+}
+
+.secondary-btn:hover {
+  border-color: #8fa8e3;
+  background: #eef2ff;
+}
+
+.message {
+  margin: 0;
+  color: #0f766e;
+  font-weight: 600;
+}
+
+.empty {
+  margin: 0;
+  color: #64748b;
+}
+
+/* 操作反馈条：固定在视口顶部，保证任意滚动位置都能看到失败原因 */
+.status-toast {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(92vw, 520px);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border-left: 4px solid #16a34a;
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 600;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+}
+
+.status-toast.is-error {
+  border-left-color: #dc2626;
+}
+
+.status-toast-close {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.status-toast-close:hover {
+  color: #0f172a;
+}
+
+/* 受控确认对话框（替代 window.confirm） */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: confirm-fade-in 160ms ease-out;
+}
+
+@keyframes confirm-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.confirm-dialog {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px 22px 16px;
+  min-width: 300px;
+  max-width: min(92vw, 420px);
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
+  animation: confirm-pop-in 160ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@keyframes confirm-pop-in {
+  from { transform: translateY(-6px) scale(0.98); opacity: 0.5; }
+  to { transform: none; opacity: 1; }
+}
+
+.confirm-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.confirm-message {
+  color: #334155;
+  line-height: 1.55;
+  white-space: pre-line;
+  margin-bottom: 18px;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.confirm-cancel,
+.confirm-ok {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  color: #334155;
+}
+
+.confirm-cancel:hover {
+  background: #f1f5f9;
+}
+
+.confirm-ok {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #ffffff;
+}
+
+.confirm-ok:hover {
+  background: #4338ca;
+  border-color: #4338ca;
+}
+
+.confirm-ok.is-danger {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.confirm-ok.is-danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+/* 修改密码对话框：三个密码字段纵向排列，比普通确认框宽一些 */
+.pwd-dialog {
+  width: min(420px, 92vw);
+  text-align: left;
+}
+
+.pwd-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.pwd-hint {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.pwd-error {
+  margin: 10px 0 0;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+/* 后台右上角：修改密码与登出并排 */
+.manager-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

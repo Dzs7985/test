@@ -1,0 +1,77 @@
+/* 登录页：校区下拉与「管理员」勾选（密码框样式见 base.css，改密对话框也共用） */
+
+/* 登录页：校区下拉 + 右侧「管理员」勾选（勾选后不需要选校区） */
+.campus-field {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.campus-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.campus-row select {
+  flex: 1;
+  min-width: 0;
+}
+
+.campus-row select:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.admin-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  user-select: none;
+}
+
+.admin-check input {
+  width: auto;
+  margin: 0;
+}
+
+/* 登录按钮与「忘记密码」并排 */
+.login-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+/* 文字按钮：用于「忘记密码」这类弱操作，不抢主按钮的视觉焦点 */
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  color: #1d4ed8;
+}
+
+/* 「忘记密码」展开后的提示：告知宿管联系哪个紧急电话 */
+.forgot-tip {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+  font-weight: 600;
+  line-height: 1.6;
+}

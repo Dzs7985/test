@@ -1,0 +1,18 @@
+/* 响应式：窄屏下的布局调整（必须最后导入，保证覆盖上面的规则） */
+
+@media (max-width: 700px) {
+  .building-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "username": "dorm1",
+    "password": "12345678",
+    "campus": "1234",
+    "building": "1号楼"
+  },
+  {
+    "username": "dorm2",
+    "password": "12345678",
+    "campus": "1234",
+    "building": "2号楼"
+  },
+  {
+    "username": "dorm3",
+    "password": "12345678",
+    "campus": "1234",
+    "building": "3号楼"
+  },
+  {
+    "username": "dorm4",
+    "password": "12345678",
+    "campus": "1234",
+    "building": "4号楼"
+  },
+  {
+    "username": "dorm5",
+    "password": "12345678",
+    "campus": "1234",
+    "building": "5号楼"
+  }
+]
