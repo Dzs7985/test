@@ -1,4 +1,4 @@
-﻿import { defaultCampusOptions, defaultBuildingOptions } from './constants';
+﻿﻿import { defaultCampusOptions, defaultBuildingOptions } from './constants';
 
 const readJson = async (res, fallback = {}) => res.json().catch(() => fallback);
 

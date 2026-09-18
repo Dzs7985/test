@@ -34,13 +34,6 @@
     "username": "admin",
     "createdAt": 1789718562390
   },
-  "1edce9ea-d9cd-4bf9-93a5-e4c5046f6b4b": {
-    "role": "manager",
-    "username": "dorm2",
-    "campus": "北校区",
-    "building": "2号楼",
-    "createdAt": 1789718562451
-  },
   "c9b94270-453c-4e15-a5c4-13770c7ea6dd": {
     "role": "admin",
     "username": "admin",
@@ -65,5 +58,29 @@
     "role": "admin",
     "username": "admin",
     "createdAt": 1789725636414
+  },
+  "4ab53ef4-f10c-46a4-9f67-c41ac3de3e13": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789734700853
+  },
+  "cc97ddd7-9376-4061-bd6c-cf7878a0437c": {
+    "role": "manager",
+    "username": "dorm2",
+    "campus": "北校区",
+    "building": "2号楼",
+    "createdAt": 1789734953885
+  },
+  "27cb65f8-a812-4351-bbba-ea51f8b8621d": {
+    "role": "manager",
+    "username": "dorm2",
+    "campus": "北校区",
+    "building": "2号楼",
+    "createdAt": 1789734953910
+  },
+  "8a429bec-ee12-421f-9403-4cac95aaed01": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789735911586
   }
 }
