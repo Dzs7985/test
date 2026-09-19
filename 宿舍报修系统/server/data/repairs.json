@@ -1,5 +1,18 @@
 [
   {
+    "id": "ba85a2bb-4bf8-42ca-b938-82e720174512",
+    "name": "l",
+    "campus": "南校区",
+    "building": "1号楼",
+    "roomNumber": "206",
+    "category": "空调",
+    "description": "huaile",
+    "contact": "1111111111",
+    "status": "已处理",
+    "createdAt": "2026-09-19T06:56:21.641Z",
+    "image": ""
+  },
+  {
     "id": "35178945-a2a0-486d-8c7a-0ff1d35548b7",
     "name": "111",
     "campus": "北校区",
@@ -8,7 +21,7 @@
     "category": "水电",
     "description": "111",
     "contact": "111111111",
-    "status": "待处理",
+    "status": "已处理",
     "createdAt": "2026-09-18T05:23:50.624Z",
     "image": ""
   }

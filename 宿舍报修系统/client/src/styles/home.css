@@ -1,84 +1,174 @@
-/* 首页：标题区与角色入口卡片 */
+/* 首页：深海蓝大横幅 + 强悬浮角色卡片 */
 
 .home-page {
   display: grid;
-  gap: 28px;
+  gap: 32px;
 }
 
+/* 大幅视觉横幅：深海蓝渐变 + 网格纹理 + 漂移光斑 */
 .hero {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(125deg, #0b1e4a 0%, #12306e 40%, #1d4ed8 78%, #2563eb 100%);
   color: white;
-  border-radius: 24px;
-  padding: 36px 32px;
-  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.2);
+  border-radius: 28px;
+  padding: 56px 44px;
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  box-shadow: 0 26px 60px rgba(11, 30, 74, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* 网格纹理层 */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(147, 197, 253, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(147, 197, 253, 0.12) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(120% 120% at 20% 0%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(120% 120% at 20% 0%, #000 30%, transparent 75%);
+  pointer-events: none;
+}
+
+/* 漂移光斑 */
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 460px;
+  height: 460px;
+  right: -120px;
+  top: -160px;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.55), transparent 65%);
+  animation: hero-glow 7s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes hero-glow {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(-50px, 46px) scale(1.15); }
+}
+
+.hero > div {
+  position: relative;
+  z-index: 1;
 }
 
 /* hero-return removed: arrow moved to topbar */
 
 .eyebrow {
-  margin: 0 0 10px;
-  letter-spacing: 0.15em;
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(147, 197, 253, 0.5);
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  font-size: 0.8rem;
-  opacity: 0.85;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #bfdbfe;
 }
 
 .hero h1 {
-  margin: 0 0 12px;
-  font-size: clamp(2rem, 3vw, 3rem);
+  margin: 0 0 14px;
+  font-size: clamp(2.2rem, 3.4vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-shadow: 0 4px 20px rgba(37, 99, 235, 0.5);
 }
 
 .hero p {
   margin: 0;
   max-width: 640px;
-  font-size: 1.05rem;
-  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.12rem;
+  color: rgba(239, 246, 255, 0.92);
 }
 
 .role-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
+  gap: 26px;
 }
 
+/* 角色入口卡片：顶部蓝色光条 + 强阴影 + 大浮动 */
 .role-card {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   text-decoration: none;
   color: inherit;
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  padding: 28px 24px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 2px solid #dbeafe;
+  border-radius: 22px;
+  padding: 32px 26px 28px;
+  box-shadow: 0 14px 34px rgba(29, 78, 216, 0.12);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+/* 顶部渐变光条 */
+.role-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8, #0b1e4a);
+}
+
+/* 右下角箭头 */
+.role-card::after {
+  content: '→';
+  position: absolute;
+  right: 22px;
+  bottom: 18px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #93c5fd;
+  transition: transform 0.22s ease, color 0.22s ease;
 }
 
 .role-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
+  transform: translateY(-8px);
+  border-color: #2563eb;
+  box-shadow: 0 26px 50px rgba(29, 78, 216, 0.28);
+}
+
+.role-card:hover::after {
+  color: #1d4ed8;
+  transform: translateX(6px);
 }
 
 .role-card.alt {
-  background: linear-gradient(135deg, #ecfeff, #f8fafc);
+  background: linear-gradient(160deg, #eff6ff 0%, #ffffff 60%);
 }
 
 .role-label {
-  color: #2563eb;
-  font-size: 0.7rem;
-  font-weight: 700;
+  display: inline-block;
+  align-self: flex-start;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 0.72rem;
+  font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .role-card strong {
-  font-size: 1.7rem;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0b1e4a;
 }
 
 .role-card small {
   color: #475569;
   line-height: 1.7;
+  padding-right: 36px;
 }
 
 .two-col {
@@ -87,16 +177,30 @@
   gap: 24px;
 }
 
+/* 通用内容面板：白底 + 粗蓝边框 + 顶部光条 */
 .panel {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.96);
+  border: 2px solid #bfdbfe;
+  border-radius: 22px;
+  padding: 28px;
+  box-shadow: 0 16px 40px rgba(29, 78, 216, 0.12);
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8, #0b1e4a);
 }
 
 .panel h2 {
   margin-top: 0;
   margin-bottom: 16px;
   font-size: 1.7rem;
+  color: #0b1e4a;
 }

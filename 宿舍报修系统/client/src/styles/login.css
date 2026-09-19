@@ -1,11 +1,59 @@
-/* 登录页：校区下拉与「管理员」勾选（密码框样式见 base.css，改密对话框也共用） */
+/* 登录页：品牌头部（logo + 标题）与表单布局；字段样式见 base.css，密码框两处共用 */
+
+/* 登录卡片：外层 section.panel 包含 login-form 时收窄居中，并带入场动画 */
+.panel:has(.login-form) {
+  max-width: 460px;
+  margin: 0 auto;
+  animation: login-card-in 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@keyframes login-card-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+.login-form {
+  display: grid;
+  gap: 16px;
+}
+
+/* 品牌头部：居中 logo + 系统名 + 登录角色说明 */
+.login-head {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+  padding: 6px 0 18px;
+  border-bottom: 2px dashed #dbeafe;
+}
+
+.login-logo {
+  margin-bottom: 8px;
+  filter: drop-shadow(0 10px 18px rgba(29, 78, 216, 0.35));
+}
+
+.login-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #0b1e4a;
+}
+
+.login-sub {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
 
 /* 登录页：校区下拉 + 右侧「管理员」勾选（勾选后不需要选校区） */
 .campus-field {
   display: grid;
   gap: 8px;
-  font-weight: 600;
-  color: #334155;
+  font-weight: 700;
+  color: #1e3a8a;
 }
 
 .campus-row {
@@ -30,23 +78,33 @@
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  font-weight: 600;
-  color: #334155;
+  font-weight: 700;
+  color: #1e3a8a;
   cursor: pointer;
   user-select: none;
 }
 
 .admin-check input {
-  width: auto;
+  width: 17px;
+  height: 17px;
   margin: 0;
+  accent-color: #2563eb;
+  cursor: pointer;
 }
 
-/* 登录按钮与「忘记密码」并排 */
+/* 登录按钮占满整行，「忘记密码」单独居中一行 */
 .login-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.login-actions .primary-btn {
+  width: 100%;
+}
+
+.login-actions .link-btn {
+  justify-self: center;
 }
 
 /* 文字按钮：用于「忘记密码」这类弱操作，不抢主按钮的视觉焦点 */
@@ -55,23 +113,25 @@
   border: none;
   padding: 0;
   font: inherit;
-  color: #2563eb;
+  font-weight: 700;
+  color: #1d4ed8;
   text-decoration: underline;
+  text-underline-offset: 3px;
   cursor: pointer;
 }
 
 .link-btn:hover {
-  color: #1d4ed8;
+  color: #0b1e4a;
 }
 
 /* 「忘记密码」展开后的提示：告知宿管联系哪个紧急电话 */
 .forgot-tip {
   margin: 10px 0 0;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 2px solid #93c5fd;
   color: #1e3a8a;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.6;
 }
