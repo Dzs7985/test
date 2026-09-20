@@ -119,5 +119,34 @@
     "campus": "南校区",
     "building": "1号楼",
     "createdAt": 1789800942821
+  },
+  "531a22ac-14a3-4c26-882a-d1bbef7e58a6": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789905572301
+  },
+  "242cbe88-defb-4437-a262-c6d194089cb1": {
+    "role": "manager",
+    "username": "dorm1",
+    "campus": "南校区",
+    "building": "1号楼",
+    "createdAt": 1789905631659
+  },
+  "b4798446-6aaa-4335-9c07-5adf6d820c1b": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789906555727
+  },
+  "4a7a8b61-d5e8-4c98-9a21-06c7185fa64f": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789906807403
+  },
+  "14ab1c77-7beb-4b19-b7f8-d17108aa3e1b": {
+    "role": "manager",
+    "username": "dorm2",
+    "campus": "北校区",
+    "building": "2号楼",
+    "createdAt": 1789907044243
   }
 }

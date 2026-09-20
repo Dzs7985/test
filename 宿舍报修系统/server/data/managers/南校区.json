@@ -34,11 +34,5 @@
     "password": "12345678",
     "campus": "南校区",
     "building": "6号楼"
-  },
-  {
-    "username": "dorm7",
-    "password": "12345678",
-    "campus": "南校区",
-    "building": "7号楼"
   }
 ]

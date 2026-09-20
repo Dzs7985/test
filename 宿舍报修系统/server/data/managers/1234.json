@@ -22,11 +22,5 @@
     "password": "12345678",
     "campus": "1234",
     "building": "4号楼"
-  },
-  {
-    "username": "dorm5",
-    "password": "12345678",
-    "campus": "1234",
-    "building": "5号楼"
   }
 ]

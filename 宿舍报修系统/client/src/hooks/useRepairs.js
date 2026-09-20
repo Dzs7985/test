@@ -5,10 +5,11 @@ import { deleteRepair, fetchRepairs, markRepairHandled } from '../lib/api';
 const POLL_INTERVAL = 5000;
 
 /**
- * 报修工单列表：查看工单、标记已处理；canDelete 为 true 时（管理员）才提供删除能力。
- * 定时轮询保证学生新提交的工单及时出现在后台。
+ * 报修工单列表：查看工单、标记已处理。
+ * canDelete 是删除权限的唯一来源（默认拒绝，只有管理员视图显式传 true），
+ * 界面与操作都读它，两层不会出现分歧。定时轮询保证学生新提交的工单及时出现在后台。
  */
-export function useRepairs(adminToken, { notify, onAuthLost, confirm, canDelete = true }) {
+export function useRepairs(adminToken, { notify, onAuthLost, confirm, canDelete = false }) {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -76,5 +77,5 @@ export function useRepairs(adminToken, { notify, onAuthLost, confirm, canDelete 
     await reload();
   };
 
-  return { records, loading, markHandled, removeRepair };
+  return { records, loading, markHandled, removeRepair, canDelete };
 }

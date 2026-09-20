@@ -27,7 +27,8 @@ export default function ManagersPanel({ adminToken, config, onAuthLost }) {
 
   const session = useMemo(() => ({ notify, confirm, onAuthLost }), [notify, confirm, onAuthLost]);
 
-  const repairs = useRepairs(adminToken, session);
+  // 管理员是唯一有删除权限的角色，显式开启（useRepairs 默认拒绝）
+  const repairs = useRepairs(adminToken, { ...session, canDelete: true });
 
   // 工单按校区 / 楼号 / 时间 / 状态筛选，只影响显示，不触发重新请求；选项与「校区和楼号设置」同步
   const activeFilters = useMemo(() => normalizeFilters(filters, config), [filters, config]);
@@ -63,7 +64,6 @@ export default function ManagersPanel({ adminToken, config, onAuthLost }) {
           <div hidden={activeMenu !== 'repairs'}>
             <RepairsBoard
               repairs={repairs}
-              canDelete
               records={visibleRecords}
               emptyText={hasActiveFilters(activeFilters) ? '没有符合筛选条件的工单' : '暂无报修工单'}
               toolbar={

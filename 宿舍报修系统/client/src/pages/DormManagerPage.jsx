@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import ChangePasswordDialog from '../components/ChangePasswordDialog';
+import ConfirmDialog from '../components/ConfirmDialog';
 import StatusToast from '../components/StatusToast';
+import { useConfirm } from '../hooks/useConfirm';
 import { useNotice } from '../hooks/useNotice';
 import { MAX_LOGIN_ATTEMPTS } from '../lib/constants';
 import LoginForm from './managers/LoginForm';
@@ -30,6 +32,7 @@ export default function DormManagerPage({ config }) {
   const [attempts, setAttempts] = useState(0);
   const [pwdOpen, setPwdOpen] = useState(false);
   const { notice, notify, clearNotice } = useNotice();
+  const { dialogProps, confirm, handleConfirm, handleCancel } = useConfirm();
 
   // 登录接口会返回角色：admin 进管理面板，宿管只进自己楼号的工单面板
   // 登录态固定存 localStorage：关掉浏览器、下次打开仍是登录状态，不用反复输账号密码
@@ -58,7 +61,14 @@ export default function DormManagerPage({ config }) {
     setLoginErr('登录状态已失效，请重新登录');
   };
 
-  const handleLogout = () => {
+  /** 登出前二次确认：避免误点后还要重新输账号密码（登出不会影响已保存的工单数据）。 */
+  const handleLogout = async () => {
+    const ok = await confirm('退出后需要重新输入账号密码登录，是否确认登出？', {
+      title: '确认登出',
+      confirmText: '登出',
+      danger: true,
+    });
+    if (!ok) return;
     clearStoredSession();
     setSession(null);
     setLoginErr('');
@@ -100,6 +110,17 @@ export default function DormManagerPage({ config }) {
           />
         )}
       </section>
+
+      <ConfirmDialog
+        open={dialogProps.open}
+        title={dialogProps.title}
+        message={dialogProps.message}
+        confirmText={dialogProps.confirmText}
+        cancelText={dialogProps.cancelText}
+        danger={dialogProps.danger}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
 
       <ChangePasswordDialog
         open={pwdOpen}

@@ -2,18 +2,18 @@ import { formatDateTime } from '../../lib/constants';
 
 /**
  * 工单看板：管理员与宿管共用。
- * canDelete 默认关闭（权限默认拒绝），只有明确传 true 的管理员视图才出现删除入口。
+ * 删除权限不在这里判断，直接沿用 repairs.canDelete（唯一来源，默认拒绝），
+ * 避免界面与操作各判一次、出现「按钮可见但点击被拦」或反之。
  * records：管理员传入筛选后的列表；toolbar：标题下方的筛选栏等附加内容。
  */
 export default function RepairsBoard({
   repairs,
-  canDelete = false,
   title = '报修工单管理',
   records,
   emptyText = '暂无报修工单',
   toolbar = null,
 }) {
-  const { records: allRecords, loading, markHandled, removeRepair } = repairs;
+  const { records: allRecords, loading, markHandled, removeRepair, canDelete } = repairs;
   const list = records || allRecords;
 
   return (
