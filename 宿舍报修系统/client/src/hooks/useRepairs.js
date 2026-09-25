@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { deleteRepair, fetchRepairs, markRepairHandled } from '../lib/api';
+import { deleteRepair, fetchRepairs, updateRepairStatus } from '../lib/api';
 
 /** 轮询间隔（毫秒）：学生一提交，宿管/管理员不刷新页面也能看到新工单 */
 const POLL_INTERVAL = 5000;
@@ -45,15 +45,25 @@ export function useRepairs(adminToken, { notify, onAuthLost, confirm, canDelete 
     };
   }, [reload]);
 
-  const markHandled = async (id) => {
-    const { ok, data } = await markRepairHandled(id, adminToken);
-    if (!ok) {
-      notify(data.error || '标记失败', 'error');
-      return;
-    }
-    notify('已标记为已处理', 'success');
-    await reload();
-  };
+  const changeStatus = useCallback(
+    async (id, action, successText) => {
+      const { ok, data } = await updateRepairStatus(id, action, adminToken);
+      if (!ok) {
+        notify(data.error || '操作失败', 'error');
+        return false;
+      }
+      notify(successText, 'success');
+      await reload();
+      return true;
+    },
+    [adminToken, notify, reload],
+  );
+
+  /** 宿管开始维修：未完成 → 维修中 */
+  const startRepair = (id) => changeStatus(id, 'start', '已开始维修');
+
+  /** 标记完成：未完成 / 维修中 → 已完成 */
+  const finishRepair = (id) => changeStatus(id, 'finish', '已标记为已完成');
 
   const removeRepair = async (id) => {
     // 权限开关在 hook 内部把关，不只依赖界面不渲染按钮
@@ -76,5 +86,5 @@ export function useRepairs(adminToken, { notify, onAuthLost, confirm, canDelete 
     await reload();
   };
 
-  return { records, loading, markHandled, removeRepair };
+  return { records, loading, startRepair, finishRepair, removeRepair };
 }

@@ -8,6 +8,7 @@ import './styles/admin.css';
 import './styles/repairs.css';
 import './styles/student.css';
 import './styles/login.css';
+import './styles/stats.css';
 import './styles/responsive.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(

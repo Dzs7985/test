@@ -1,28 +1,29 @@
 /* 报修工单：筛选栏、工单卡片、处理与删除按钮 */
 
-/* 工单筛选栏：按校区 / 楼号 / 时间 / 状态区分工单 */
+/* 工单筛选栏：白底粗蓝边框卡片 */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 12px;
   margin-top: 12px;
-  padding: 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  background: #f8fafc;
+  padding: 18px;
+  border: 2px solid #bfdbfe;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(29, 78, 216, 0.1);
 }
 
 .filter-field {
   display: grid;
   gap: 6px;
   flex: 0 0 150px;
-  font-weight: 600;
-  color: #334155;
+  font-weight: 700;
+  color: #0b1e4a;
 }
 
 .filter-field select {
-  padding: 9px 10px;
+  padding: 10px;
 }
 
 /* 楼号筛选未选校区时禁用，与报修表单的「请先选择校区」一致 */
@@ -40,20 +41,42 @@
 }
 
 .filter-summary {
-  color: #64748b;
+  color: #1d4ed8;
   font-size: 14px;
+  font-weight: 700;
 }
 
 .record-list {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
+/* 工单卡片：白底 + 左侧蓝色竖条 + hover 蓝边发光 */
 .record-card {
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  background: #f8fafc;
-  padding: 18px;
+  position: relative;
+  border: 2px solid #dbeafe;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 20px 20px 20px 24px;
+  box-shadow: 0 10px 26px rgba(29, 78, 216, 0.09);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.record-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 5px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+}
+
+.record-card:hover {
+  border-color: #60a5fa;
+  transform: translateY(-3px);
+  box-shadow: 0 18px 38px rgba(29, 78, 216, 0.2);
 }
 
 .record-head {
@@ -62,7 +85,9 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
-  font-weight: 700;
+  font-weight: 800;
+  color: #0b1e4a;
+  font-size: 1.05rem;
 }
 
 .record-card p {
@@ -70,24 +95,35 @@
   color: #475569;
 }
 
+/* 状态徽章：加大加边框，保持黄/绿语义色 */
 .status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  padding: 5px 10px;
-  font-size: 0.75rem;
-  font-weight: 700;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border: 2px solid transparent;
 }
 
 .status.pending {
   background: #fef3c7;
   color: #92400e;
+  border-color: #fcd34d;
+}
+
+.status.doing {
+  background: #e0f2fe;
+  color: #075985;
+  border-color: #7dd3fc;
 }
 
 .status.done {
   background: #dcfce7;
   color: #166534;
+  border-color: #86efac;
 }
 
 .manager-card {
@@ -100,11 +136,15 @@
   margin-top: 14px;
 }
 
+/* 删除按钮：红色实色渐变，与蓝色主按钮区分 */
 .manager-actions button.danger {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  box-shadow: 0 10px 22px rgba(220, 38, 38, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .manager-actions button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }

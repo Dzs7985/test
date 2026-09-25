@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import AlnumInput from '../../components/AlnumInput';
+import Logo from '../../components/Logo';
 import PasswordField from '../../components/PasswordField';
 import { login } from '../../lib/api';
 import { MAX_LOGIN_ATTEMPTS } from '../../lib/constants';
@@ -42,7 +43,13 @@ export default function LoginForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="panel">
+    <form onSubmit={handleSubmit} className="login-form">
+      <div className="login-head">
+        <Logo size={68} className="login-logo" />
+        <h2 className="login-title">宿舍报修系统</h2>
+        <p className="login-sub">宿管 / 管理员登录</p>
+      </div>
+
       <div className="campus-field">
         <span>校区</span>
         <div className="campus-row">
@@ -103,7 +110,7 @@ export default function LoginForm({
       ) : null}
 
       {error ? (
-        <p className="message" style={{ color: 'crimson' }}>
+        <p className="message" style={{ color: '#dc2626' }}>
           {error}
         </p>
       ) : null}

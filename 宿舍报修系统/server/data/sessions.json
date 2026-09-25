@@ -82,5 +82,121 @@
     "role": "admin",
     "username": "admin",
     "createdAt": 1789735911586
+  },
+  "c4dc52ff-99c5-4e22-9692-f3487816805f": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789797066295
+  },
+  "e20f3ad6-905d-4758-9828-98df7023d948": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789797790176
+  },
+  "07b57197-b284-4ad1-8ad1-81a507235218": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789799664309
+  },
+  "6dbe5388-722e-4bcf-b615-f8c8c8355a56": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789799701511
+  },
+  "0943225a-2dff-4f3c-ba2b-12f440595348": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789799790877
+  },
+  "d6175030-5c71-4e24-bba3-04187ea86f7d": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789800913395
+  },
+  "72bf36e8-d6bf-44ac-a75a-c451d807568a": {
+    "role": "manager",
+    "username": "dorm1",
+    "campus": "南校区",
+    "building": "1号楼",
+    "createdAt": 1789800942821
+  },
+  "55ccbaa8-c51e-431b-8712-8d753cfbb507": {
+    "role": "manager",
+    "username": "dorm1",
+    "campus": "南校区",
+    "building": "1号楼",
+    "createdAt": 1789801742170
+  },
+  "8d6fddac-22e6-4f75-af48-edabdac6f0f1": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1789801773687
+  },
+  "c76eab6f-f254-4928-9cf7-e75a2e321816": {
+    "role": "student",
+    "username": "123456",
+    "createdAt": 1790304423160
+  },
+  "83eb8640-f8ff-40b4-88d2-3ec6cfb44bbb": {
+    "role": "student",
+    "username": "123456",
+    "createdAt": 1790304423164
+  },
+  "7a13cf2b-aaad-4cb7-80ad-c8b13d1aa66c": {
+    "role": "student",
+    "username": "123456",
+    "createdAt": 1790304536993
+  },
+  "ff2e39ea-c925-42fb-92d6-91958916faae": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1790304537012
+  },
+  "a1058cad-32b3-4fbc-8618-4d4a6ddf98a5": {
+    "role": "student",
+    "username": "123456",
+    "createdAt": 1790304578332
+  },
+  "019b1a98-d3f5-48af-a1ae-095ebbef9787": {
+    "role": "student",
+    "username": "123456",
+    "createdAt": 1790304659382
+  },
+  "4b7fe0a9-87a0-422f-ac46-cf808bf92c44": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1790305631692
+  },
+  "07077356-c20c-444b-9ed7-e9d7b1095a4c": {
+    "role": "student",
+    "username": "123456",
+    "createdAt": 1790305631747
+  },
+  "49824a3e-d468-46f0-a38c-566f0b93cf84": {
+    "role": "student",
+    "username": "123456",
+    "createdAt": 1790305678042
+  },
+  "a4c9b044-1e52-4b2e-a50a-7d6a32cb0269": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1790305723009
+  },
+  "c62ffafe-d624-454a-8ded-1667b04c22eb": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1790305812513
+  },
+  "17f6e81c-8394-4f84-8cc5-87ee2b58b61c": {
+    "role": "admin",
+    "username": "admin",
+    "createdAt": 1790306124411
+  },
+  "241905e2-b9fd-41f6-b068-a7cdb6307388": {
+    "role": "manager",
+    "username": "dorm1",
+    "campus": "南校区",
+    "building": "1号楼",
+    "createdAt": 1790306149848
   }
 }

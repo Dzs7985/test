@@ -6,6 +6,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { readAdminPassword, writeAdminPassword } from './adminStore.js';
+import {
+  INITIAL_STUDENT_PASSWORD,
+  INITIAL_STUDENT_USERNAME,
+  readStudentAccount,
+  writeStudentPassword,
+} from './studentStore.js';
 import { migrateLegacyManagers, readManagers, removeCampusAccounts, renameCampusAccounts, writeManagers } from './managerStore.js';
 import { createManagerRoutes } from './managerRoutes.js';
 import { getSession as readStoredSession, removeSessions, saveSession } from './sessionStore.js';
@@ -39,6 +45,38 @@ if (!fs.existsSync(configFile)) {
 // 历史数据：旧的单一 managers.json 按校区拆分到 data/managers/<校区>.json
 migrateLegacyManagers();
 
+/**
+ * 工单状态三态模型：未完成 → 维修中 → 已完成。
+ * 历史数据里的「待处理 / 已处理」在读取时归一化，并在启动时一次性迁移落盘。
+ */
+const STATUS_PENDING = '未完成';
+const STATUS_DOING = '维修中';
+const STATUS_DONE = '已完成';
+const VALID_STATUSES = new Set([STATUS_PENDING, STATUS_DOING, STATUS_DONE]);
+const LEGACY_STATUS = { 待处理: STATUS_PENDING, 已处理: STATUS_DONE };
+
+const normalizeStatus = (status) =>
+  VALID_STATUSES.has(status) ? status : LEGACY_STATUS[status] || STATUS_PENDING;
+
+(() => {
+  let repairs = [];
+  try {
+    repairs = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+  } catch {
+    repairs = [];
+  }
+  if (!Array.isArray(repairs)) return;
+  let changed = false;
+  repairs.forEach((item) => {
+    const next = normalizeStatus(item.status);
+    if (next !== item.status) {
+      item.status = next;
+      changed = true;
+    }
+  });
+  if (changed) fs.writeFileSync(dataFile, JSON.stringify(repairs, null, 2), 'utf8');
+})();
+
 const app = express();
 const PORT = 3001;
 
@@ -52,6 +90,10 @@ const ADMIN_USERNAME = process.env.ADMIN_USER || 'admin';
 /** 初始管理员密码：仅在还没有存盘密码时使用，管理员改密后会以 data/admin.json 为准 */
 const INITIAL_ADMIN_PASSWORD = process.env.ADMIN_PASS || 'password123';
 const adminPassword = () => readAdminPassword() || INITIAL_ADMIN_PASSWORD;
+
+/** 学生账号：全局单一账号（初始 123456 / 123456），学生改密后以存盘文件为准 */
+const studentAccount = () =>
+  readStudentAccount() || { username: INITIAL_STUDENT_USERNAME, password: INITIAL_STUDENT_PASSWORD };
 
 const readToken = (req) =>
   req.headers['x-admin-token'] || (req.headers.authorization || '').replace(/^Bearer\s*/i, '');
@@ -67,10 +109,21 @@ const dropSessionsOf = (campus, username) =>
   );
 
 app.post('/api/login', (req, res) => {
-  const { username, password, campus } = req.body || {};
+  const { username, password, campus, role } = req.body || {};
   // Validate username/password only contain letters and numbers
   if (!isAlnum(username) || !isAlnum(password)) {
     return res.status(400).json({ success: false, error: '用户名和密码仅允许字母与数字' });
+  }
+
+  // 学生入口显式带 role=student：只校验学生账号，不落入宿管分支，错误统一为「用户名或密码错误」
+  if (role === 'student') {
+    const student = studentAccount();
+    if (username !== student.username || password !== student.password) {
+      return res.status(401).json({ success: false, error: '用户名或密码错误' });
+    }
+    const token = uuidv4();
+    saveSession(token, { role: 'student', username: student.username });
+    return res.json({ success: true, token, role: 'student', username: student.username });
   }
 
   // 管理员是全局账号，不受校区限制（登录页的校区留空即可）
@@ -78,6 +131,14 @@ app.post('/api/login', (req, res) => {
     const token = uuidv4();
     saveSession(token, { role: 'admin', username: ADMIN_USERNAME });
     return res.json({ success: true, token, role: 'admin', username: ADMIN_USERNAME });
+  }
+
+  // 学生账号：全局单一账号，登录后才能提交报修（不需要选校区）
+  const student = studentAccount();
+  if (username === student.username && password === student.password) {
+    const token = uuidv4();
+    saveSession(token, { role: 'student', username: student.username });
+    return res.json({ success: true, token, role: 'student', username: student.username });
   }
 
   // 宿管账号按校区分库存储，登录必须带上校区才能定位到唯一账号
@@ -173,13 +234,37 @@ app.get('/api/repairs', (req, res) => {
   if (!session) {
     return res.status(403).json({ error: '请先登录' });
   }
+  // 工单总表只对管理员 / 宿管开放；学生只能走 /api/my-repairs 查自己的工单
+  if (session.role === 'student') {
+    return res.status(403).json({ error: '学生账号请在「我的报修」中查看' });
+  }
 
-  let repairs = readRepairs();
+  let repairs = readRepairs().map((item) => ({ ...item, status: normalizeStatus(item.status) }));
   if (session.role === 'manager') {
     // 宿管只能看到自己所在校区、自己楼号的工单
     repairs = repairs.filter((item) => item.campus === session.campus && item.building === session.building);
   }
   return res.json(repairs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+});
+
+// 学生查询自己的报修：按「姓名 + 联系方式」精确匹配，在后端过滤，避免学生拿到他人工单
+app.get('/api/my-repairs', (req, res) => {
+  const session = getSession(req);
+  if (!session || session.role !== 'student') {
+    return res.status(403).json({ error: '请先使用学生账号登录' });
+  }
+
+  const name = String(req.query.name || '').trim();
+  const contact = String(req.query.contact || '').trim();
+  if (!name || !contact) {
+    return res.status(400).json({ error: '请填写姓名与联系方式' });
+  }
+
+  const repairs = readRepairs()
+    .map((item) => ({ ...item, status: normalizeStatus(item.status) }))
+    .filter((item) => item.name === name && item.contact === contact)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return res.json(repairs);
 });
 
 // 宿管账号接口：按校区作用域化，数据按校区独立存取
@@ -262,6 +347,19 @@ app.patch('/api/me/password', (req, res) => {
     return res.json({ success: true, message: '密码修改成功' });
   }
 
+  // 学生：改全局学生账号的密码（存 data/student.json）
+  if (session.role === 'student') {
+    if (oldPassword !== studentAccount().password) {
+      return res.status(401).json({ error: '原密码不正确' });
+    }
+    writeStudentPassword(newPassword);
+    // 其它设备上的旧登录态立即失效，当前这一台保持登录
+    removeSessions(
+      (item, token) => item.role === 'student' && token !== readToken(req),
+    );
+    return res.json({ success: true, message: '密码修改成功' });
+  }
+
   // 宿管：改自己账号记录里的密码（账号按校区分库存放）
   const list = readManagers(session.campus);
   const index = list.findIndex((item) => item.username === session.username);
@@ -285,6 +383,12 @@ app.patch('/api/me/password', (req, res) => {
 });
 
 app.post('/api/repairs', upload.single('image'), (req, res) => {
+  // 提交报修必须是已登录的学生账号，避免匿名提交
+  const session = getSession(req);
+  if (!session || session.role !== 'student') {
+    return res.status(403).json({ error: '请先使用学生账号登录' });
+  }
+
   const { roomNumber, category, description, contact, name, building, campus } = req.body;
 
   if (!roomNumber || !category || !description || !building || !campus) {
@@ -300,7 +404,7 @@ app.post('/api/repairs', upload.single('image'), (req, res) => {
     category,
     description,
     contact: contact || '',
-    status: '待处理',
+    status: STATUS_PENDING,
     createdAt: new Date().toISOString(),
     image: req.file ? `/uploads/${req.file.filename}` : '',
   };
@@ -317,6 +421,9 @@ app.patch('/api/repairs/:id', (req, res) => {
   if (!session) {
     return res.status(403).json({ error: '请先登录' });
   }
+  if (session.role === 'student') {
+    return res.status(403).json({ error: '学生账号不能处理工单' });
+  }
 
   const repairs = readRepairs();
   const index = repairs.findIndex((item) => item.id === req.params.id);
@@ -330,7 +437,21 @@ app.patch('/api/repairs/:id', (req, res) => {
     return res.status(403).json({ error: '只能处理本楼号的工单' });
   }
 
-  repairs[index].status = '已处理';
+  // 状态流转：start=开始维修（未完成→维修中），finish=标记完成（未完成/维修中→已完成，兼容无 body 的旧调用）
+  const action = String(req.body?.action || 'finish');
+  const current = normalizeStatus(target.status);
+  let nextStatus;
+  if (action === 'start') {
+    if (current === STATUS_DONE) return res.status(400).json({ error: '该工单已完成，不能再开始维修' });
+    nextStatus = STATUS_DOING;
+  } else if (action === 'finish') {
+    if (current === STATUS_DONE) return res.status(400).json({ error: '该工单已是完成状态' });
+    nextStatus = STATUS_DONE;
+  } else {
+    return res.status(400).json({ error: '不支持的操作' });
+  }
+
+  repairs[index].status = nextStatus;
   writeRepairs(repairs);
   res.json(repairs[index]);
 });

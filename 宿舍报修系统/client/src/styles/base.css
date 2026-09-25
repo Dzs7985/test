@@ -1,11 +1,29 @@
 /* 全局基础样式：设计变量、重置、页面骨架、顶栏、通用表单控件、按钮、提示条、确认对话框 */
 
 :root {
+  /* 深蓝白强对比主题色板：深海蓝主色、亮蓝强调、纯白卡片 */
+  --brand-900: #0b1e4a;
+  --brand-800: #12306e;
+  --brand-700: #1d4ed8;
+  --brand-600: #2563eb;
+  --brand-500: #3b82f6;
+  --brand-400: #60a5fa;
+  --brand-300: #93c5fd;
+  --brand-200: #bfdbfe;
+  --brand-100: #dbeafe;
+  --brand-50: #eff6ff;
+  --brand-soft: #f0f6ff;
+  --deep-gradient: linear-gradient(135deg, #0b1e4a 0%, #12306e 45%, #1d4ed8 100%);
+  --brand-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 60%, #1e40af 100%);
+  --brand-ring: rgba(37, 99, 235, 0.22);
+  --brand-shadow: rgba(29, 78, 216, 0.28);
+  --border-soft: #bfdbfe;
+  --surface: #ffffff;
   font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #1f2937;
-  background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
+  color: #0f172a;
+  background: linear-gradient(180deg, #bfdbfe 0%, #dbeafe 30%, #eff6ff 60%, #ffffff 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -24,7 +42,17 @@ html, body, #root {
 
 body {
   margin: 0;
-  background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
+  /* 强烈蓝白基调：深蓝大光斑 + 蓝色网格纹理 + 蓝白渐变底（全部固定不随滚动移动） */
+  background-color: #dbeafe;
+  background-image:
+    radial-gradient(1200px 620px at 85% -12%, rgba(29, 78, 216, 0.30), transparent 60%),
+    radial-gradient(1000px 600px at -8% 108%, rgba(37, 99, 235, 0.28), transparent 58%),
+    linear-gradient(rgba(37, 99, 235, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.07) 1px, transparent 1px),
+    linear-gradient(180deg, #bfdbfe 0%, #dbeafe 28%, #eff6ff 58%, #ffffff 100%);
+  background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
+  background-size: auto, auto, 44px 44px, 44px 44px, auto;
+  background-attachment: fixed;
 }
 
 button,
@@ -48,39 +76,57 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 18px 24px;
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.95);
-  color: #fff;
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+  padding: 22px 24px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #0b1e4a 0%, #12306e 50%, #1d4ed8 100%);
+  color: #ffffff;
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  box-shadow: 0 18px 40px rgba(11, 30, 74, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  position: relative;
+  overflow: hidden;
 }
 
-.topbar .brand { color: #fff; }
+/* 顶栏表面横向光带 */
+.topbar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(147, 197, 253, 0.18) 48%, rgba(255, 255, 255, 0.10) 52%, transparent 70%);
+  pointer-events: none;
+}
 
-.topbar { position: relative; }
+.topbar .brand { color: #ffffff; }
+
 .topbar-return {
   position: absolute;
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
+  z-index: 1;
+  width: 42px;
+  height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.06);
-  border-radius: 8px;
-  color: white;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  border-radius: 10px;
+  color: #ffffff;
   text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
-.topbar-return:hover { background: rgba(255,255,255,0.12); }
+.topbar-return:hover { background: rgba(96, 165, 250, 0.35); transform: translateY(-50%) translateX(-2px); }
 
 .brand {
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-decoration: none;
   cursor: default;
+  text-shadow: 0 2px 12px rgba(96, 165, 250, 0.55);
 }
 
 /* 密码输入框与「显示/隐藏」眼睛按钮：登录页与修改密码对话框共用 */
@@ -121,7 +167,7 @@ button {
 .nav { display: none; }
 
 .nav a {
-  color: white;
+  color: var(--brand-700);
   text-decoration: none;
   padding: 10px 14px;
   border-radius: 10px;
@@ -130,7 +176,7 @@ button {
 
 .nav a.active,
 .nav a:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--brand-50);
 }
 
 .main-content {
@@ -144,17 +190,21 @@ button {
 label {
   display: grid;
   gap: 8px;
-  font-weight: 600;
-  color: #334155;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+h2, h3 {
+  color: #0b1e4a;
 }
 
 input,
 select,
 textarea {
   width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  padding: 11px 12px;
+  border: 2px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 12px 14px;
   background: white;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -163,8 +213,8 @@ input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
 }
 
 textarea {
@@ -191,32 +241,71 @@ select option[value=""] {
 .primary-btn,
 .search-box button,
 .manager-actions button {
+  position: relative;
+  overflow: hidden;
   border: none;
-  border-radius: 10px;
-  padding: 11px 16px;
+  border-radius: 12px;
+  padding: 13px 24px;
   color: white;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  font-weight: 600;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1e40af 100%);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 10px 22px rgba(29, 78, 216, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-/* 次要按钮：用于「修改」这类进入编辑态的操作，与蓝底主按钮「保存」区分开 */
+/* 主按钮光泽扫过 */
+.primary-btn::after,
+.search-box button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+}
+
+.primary-btn:hover::after,
+.search-box button:hover::after {
+  left: 130%;
+}
+
+.primary-btn:hover,
+.search-box button:hover,
+.manager-actions button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(29, 78, 216, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.primary-btn:active,
+.search-box button:active,
+.manager-actions button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* 次要按钮：白底蓝边蓝字，与蓝底主按钮「保存」区分开 */
 .secondary-btn {
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  padding: 11px 16px;
-  color: #334155;
+  border: 2px solid #93c5fd;
+  border-radius: 12px;
+  padding: 12px 22px;
+  color: #1d4ed8;
   background: #ffffff;
-  font-weight: 600;
+  font-weight: 700;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
 
 .secondary-btn:hover {
-  border-color: #8fa8e3;
-  background: #eef2ff;
+  border-color: #2563eb;
+  background: #eff6ff;
+  transform: translateY(-2px);
 }
 
 .message {
   margin: 0;
-  color: #0f766e;
+  color: var(--brand-700);
   font-weight: 600;
 }
 
@@ -281,11 +370,12 @@ select option[value=""] {
 
 .confirm-dialog {
   background: #ffffff;
-  border-radius: 14px;
-  padding: 20px 22px 16px;
+  border: 2px solid #bfdbfe;
+  border-radius: 18px;
+  padding: 22px 24px 18px;
   min-width: 300px;
   max-width: min(92vw, 420px);
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
+  box-shadow: 0 24px 60px rgba(11, 30, 74, 0.3);
   animation: confirm-pop-in 160ms cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
@@ -318,7 +408,7 @@ select option[value=""] {
 .confirm-ok {
   padding: 8px 18px;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--brand-100);
   background: #ffffff;
   cursor: pointer;
   font: inherit;
@@ -327,18 +417,19 @@ select option[value=""] {
 }
 
 .confirm-cancel:hover {
-  background: #f1f5f9;
+  background: var(--brand-50);
 }
 
 .confirm-ok {
-  background: #4f46e5;
-  border-color: #4f46e5;
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  border-color: #1d4ed8;
   color: #ffffff;
+  box-shadow: 0 8px 18px rgba(29, 78, 216, 0.3);
 }
 
 .confirm-ok:hover {
-  background: #4338ca;
-  border-color: #4338ca;
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  border-color: #1e3a8a;
 }
 
 .confirm-ok.is-danger {

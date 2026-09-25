@@ -13,6 +13,20 @@ export const defaultBuildingOptions = ['1号楼', '2号楼', '3号楼', '4号楼
 
 export const repairCategories = ['水电', '网络', '门窗', '空调', '家具', '其他'];
 
+/** 工单状态三态：未完成（提交后）→ 维修中（宿管开始处理）→ 已完成 */
+export const REPAIR_STATUS_PENDING = '未完成';
+export const REPAIR_STATUS_DOING = '维修中';
+export const REPAIR_STATUS_DONE = '已完成';
+
+/** 与服务端 index.js 的 LEGACY_STATUS 对应：历史数据「待处理 / 已处理」的展示归一化 */
+const LEGACY_REPAIR_STATUS = { 待处理: REPAIR_STATUS_PENDING, 已处理: REPAIR_STATUS_DONE };
+
+export const normalizeRepairStatus = (status) =>
+  LEGACY_REPAIR_STATUS[status] || status || REPAIR_STATUS_PENDING;
+
+export const isRepairDone = (status) => normalizeRepairStatus(status) === REPAIR_STATUS_DONE;
+export const isRepairDoing = (status) => normalizeRepairStatus(status) === REPAIR_STATUS_DOING;
+
 export const MAX_LOGIN_ATTEMPTS = 5;
 
 /** 与服务端 managerRoutes.js 的 INITIAL_PASSWORD 保持一致：一键生成楼号时新建账号的初始密码 */
