@@ -107,6 +107,20 @@
   justify-self: center;
 }
 
+/* 学生登录页的初始账号提示 */
+.login-tip {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.6;
+  text-align: center;
+}
+
 /* 文字按钮：用于「忘记密码」这类弱操作，不抢主按钮的视觉焦点 */
 .link-btn {
   background: none;

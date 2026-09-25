@@ -1,4 +1,4 @@
-﻿﻿import { defaultCampusOptions, defaultBuildingOptions } from './constants';
+import { defaultCampusOptions, defaultBuildingOptions } from './constants';
 
 const readJson = async (res, fallback = {}) => res.json().catch(() => fallback);
 
@@ -21,12 +21,12 @@ export const normalizeConfig = (data) => {
   return { campuses, buildings: fallbackBuildings, campusBuildings, emergencyPhone: String(data.emergencyPhone || '') };
 };
 
-/** campus 为空时表示管理员登录（管理员是全局账号）。 */
-export const login = async (username, password, campus) => {
+/** campus 为空时表示管理员登录（管理员是全局账号）。role 为 'student' 时走学生账号通道。 */
+export const login = async (username, password, campus, role) => {
   const res = await fetch('/api/login', {
     method: 'POST',
     headers: jsonHeaders(),
-    body: JSON.stringify({ username, password, campus: campus || '' }),
+    body: JSON.stringify({ username, password, campus: campus || '', role: role || undefined }),
   });
   return { ok: res.ok, data: await readJson(res) };
 };
@@ -83,12 +83,21 @@ export const fetchRepairs = async (token) => {
   return { ok: res.ok, status: res.status, data: await readJson(res, []) };
 };
 
-export const markRepairHandled = async (repairId, token) => {
+/** 更新工单状态：action='start' 开始维修（→维修中），'finish' 标记完成（→已完成） */
+export const updateRepairStatus = async (repairId, action, token) => {
   const res = await fetch(`/api/repairs/${repairId}`, {
     method: 'PATCH',
-    headers: tokenHeaders(token),
+    headers: tokenHeaders(token, jsonHeaders()),
+    body: JSON.stringify({ action }),
   });
   return { ok: res.ok, data: await readJson(res) };
+};
+
+/** 学生查询自己的报修：姓名 + 联系方式精确匹配，后端按学生登录态鉴权 */
+export const fetchMyRepairs = async (name, contact, token) => {
+  const query = `name=${encodeURIComponent(name)}&contact=${encodeURIComponent(contact)}`;
+  const res = await fetch(`/api/my-repairs?${query}`, { headers: tokenHeaders(token) });
+  return { ok: res.ok, status: res.status, data: await readJson(res, []) };
 };
 
 export const deleteRepair = async (repairId, token) => {
@@ -109,7 +118,11 @@ export const changeOwnPassword = async (oldPassword, newPassword, token) => {
   return { ok: res.ok, data: await readJson(res) };
 };
 
-export const submitRepair = async (formData) => {
-  const res = await fetch('/api/repairs', { method: 'POST', body: formData });
-  return { ok: res.ok, data: await readJson(res) };
+export const submitRepair = async (formData, token) => {
+  const res = await fetch('/api/repairs', {
+    method: 'POST',
+    headers: tokenHeaders(token),
+    body: formData,
+  });
+  return { ok: res.ok, status: res.status, data: await readJson(res) };
 };

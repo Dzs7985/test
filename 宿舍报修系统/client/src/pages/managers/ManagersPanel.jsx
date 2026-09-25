@@ -6,6 +6,7 @@ import { useNotice } from '../../hooks/useNotice';
 import { useRepairs } from '../../hooks/useRepairs';
 import AdminConfigSections from './settings/AdminConfigSections';
 import RepairsBoard from './RepairsBoard';
+import StatsBoard from './StatsBoard';
 import RepairsFilters, {
   applyRepairFilters,
   emptyRepairFilters,
@@ -16,6 +17,7 @@ import RepairsFilters, {
 /** 左侧主菜单：点击切换右侧内容区显示哪一块 */
 const menus = [
   { key: 'config', label: '校区和楼号设置' },
+  { key: 'stats', label: '数据统计看板' },
   { key: 'repairs', label: '报修工单管理' },
 ];
 
@@ -59,6 +61,9 @@ export default function ManagersPanel({ adminToken, config, onAuthLost }) {
           {/* 两块内容都保持挂载、只切换显示：来回切菜单不会重新拉取配置和工单，未保存的编辑内容也不会丢 */}
           <div hidden={activeMenu !== 'config'}>
             <AdminConfigSections adminToken={adminToken} session={session} />
+          </div>
+          <div hidden={activeMenu !== 'stats'}>
+            <StatsBoard records={repairs.records} loading={repairs.loading} />
           </div>
           <div hidden={activeMenu !== 'repairs'}>
             <RepairsBoard

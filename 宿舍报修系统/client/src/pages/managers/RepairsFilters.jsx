@@ -1,4 +1,6 @@
 /** 时间范围选项：按提交时间过滤 */
+import { normalizeRepairStatus } from '../../lib/constants';
+
 const TIME_OPTIONS = [
   { value: 'all', label: '全部时间' },
   { value: 'today', label: '今天' },
@@ -11,9 +13,12 @@ const RANGE_DAYS = { today: 1, week: 7, month: 30 };
 
 const STATUS_OPTIONS = [
   { value: 'all', label: '全部状态' },
-  { value: 'pending', label: '待处理' },
-  { value: 'done', label: '已处理' },
+  { value: 'pending', label: '未完成' },
+  { value: 'doing', label: '维修中' },
+  { value: 'done', label: '已完成' },
 ];
+
+const STATUS_LABEL = { pending: '未完成', doing: '维修中', done: '已完成' };
 
 export const emptyRepairFilters = { campus: '', building: '', time: 'all', status: 'all' };
 
@@ -46,8 +51,10 @@ export const applyRepairFilters = (records, filters) => {
   return records.filter((item) => {
     if (filters.campus && item.campus !== filters.campus) return false;
     if (filters.building && item.building !== filters.building) return false;
-    if (filters.status === 'pending' && item.status === '已处理') return false;
-    if (filters.status === 'done' && item.status !== '已处理') return false;
+    const status = normalizeRepairStatus(item.status);
+    if (filters.status !== 'all' && status !== STATUS_LABEL[filters.status]) {
+      return false;
+    }
     if (from) {
       const created = new Date(item.createdAt).getTime();
       if (!(created >= from)) return false;

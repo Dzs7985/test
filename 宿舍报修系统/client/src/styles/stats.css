@@ -1,0 +1,318 @@
+/* 管理员数据统计看板：指标卡 + 故障占比环形图 + 累计完成率 */
+
+.stats-board {
+  display: grid;
+  gap: 20px;
+}
+
+.stats-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stats-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0b1e4a;
+}
+
+.stats-month {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* 五个核心指标卡 */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-height: 132px;
+  padding: 20px 22px;
+  border: 2px solid #dbeafe;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(29, 78, 216, 0.1);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 6px;
+}
+
+.stat-card-total::before {
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+}
+
+.stat-card-pending::before {
+  background: linear-gradient(180deg, #fbbf24, #d97706);
+}
+
+.stat-card-doing::before {
+  background: linear-gradient(180deg, #38bdf8, #0369a1);
+}
+
+.stat-card-done::before {
+  background: linear-gradient(180deg, #34d399, #059669);
+}
+
+.stat-card-rate::before {
+  background: linear-gradient(180deg, #60a5fa, #1e40af);
+}
+
+.stat-card-rate {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.stat-value {
+  font-size: 2.4rem;
+  line-height: 1.1;
+  font-weight: 800;
+  color: #0b1e4a;
+}
+
+.stat-unit {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.stat-card-done .stat-value {
+  color: #047857;
+}
+
+.stat-card-doing .stat-value {
+  color: #0369a1;
+}
+
+.stat-card-pending .stat-value {
+  color: #b45309;
+}
+
+/* 圆环（完成率小环 + 环形图中心文字通用） */
+.ring-wrap {
+  position: relative;
+  flex: none;
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0b1e4a;
+}
+
+/* 故障占比面板（复用 .panel 白底卡片） */
+.stats-category-panel {
+  padding: 24px 26px;
+}
+
+.stats-section-title {
+  margin: 0 0 18px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0b1e4a;
+}
+
+.stats-category-body {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 30px;
+  align-items: center;
+}
+
+.donut-wrap {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  margin: 0 auto;
+}
+
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.donut-center strong {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0b1e4a;
+  line-height: 1.1;
+}
+
+.donut-center span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+/* 图例：色点 + 名称 + 占比条 + 数量 + 百分比 */
+.category-legend {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legend-row {
+  display: grid;
+  grid-template-columns: 14px 52px minmax(60px, 1fr) 56px 52px;
+  align-items: center;
+  gap: 10px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+}
+
+.legend-name {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.legend-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: #eff6ff;
+  overflow: hidden;
+}
+
+.legend-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.legend-count {
+  text-align: right;
+  color: #475569;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.legend-pct {
+  text-align: right;
+  color: #1d4ed8;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.stats-empty {
+  margin: 0;
+  padding: 28px 0;
+  text-align: center;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* 累计完成率 */
+.stats-overall {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  gap: 8px 18px;
+  align-items: center;
+  padding: 22px 26px;
+}
+
+.overall-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.overall-note {
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.overall-track {
+  grid-column: 1;
+  height: 14px;
+  border-radius: 999px;
+  background: #eff6ff;
+  overflow: hidden;
+}
+
+.overall-track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  transition: width 0.5s ease;
+}
+
+.overall-pct {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  justify-self: end;
+  align-self: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0b1e4a;
+}
+
+/* 中窄屏：指标卡 2 列，占比图与图例上下堆叠 */
+@media (max-width: 1100px) {
+  .stat-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-category-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+}
+
+@media (max-width: 620px) {
+  .legend-row {
+    grid-template-columns: 14px 48px minmax(50px, 1fr) 48px;
+  }
+
+  .legend-pct {
+    display: none;
+  }
+}
