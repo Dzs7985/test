@@ -56,20 +56,6 @@
 
 /* hero-return removed: arrow moved to topbar */
 
-.eyebrow {
-  display: inline-block;
-  margin: 0 0 16px;
-  padding: 6px 16px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(147, 197, 253, 0.5);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #bfdbfe;
-}
-
 .hero h1 {
   margin: 0 0 14px;
   font-size: clamp(2.2rem, 3.4vw, 3.4rem);

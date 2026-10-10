@@ -46,13 +46,14 @@ export function useRepairs(adminToken, { notify, onAuthLost, confirm, canDelete 
     };
   }, [reload]);
 
-  const markHandled = async (id) => {
-    const { ok, data } = await markRepairHandled(id, adminToken);
+  /** 标记已处理并附上文字处理说明（学生在自查页面能看到），说明可留空。 */
+  const markHandled = async (id, feedback = '') => {
+    const { ok, data } = await markRepairHandled(id, adminToken, feedback);
     if (!ok) {
       notify(data.error || '标记失败', 'error');
       return;
     }
-    notify('已标记为已处理', 'success');
+    notify('已标记为已处理，处理说明将展示给学生自查', 'success');
     await reload();
   };
 
@@ -62,7 +63,7 @@ export function useRepairs(adminToken, { notify, onAuthLost, confirm, canDelete 
       notify('当前账号没有删除工单的权限', 'error');
       return;
     }
-    const ok = await confirm('此操作不可恢复。是否确认删除该报修工单？', {
+    const ok = await confirm('删除后工单会移入回收站，可在保留期内恢复。是否确认删除该报修工单？', {
       title: '删除工单',
       confirmText: '删除',
       danger: true,
@@ -73,7 +74,7 @@ export function useRepairs(adminToken, { notify, onAuthLost, confirm, canDelete 
       notify(data.error || '删除失败', 'error');
       return;
     }
-    notify('工单删除成功', 'success');
+    notify(data.message || '已移入回收站', 'success');
     await reload();
   };
 

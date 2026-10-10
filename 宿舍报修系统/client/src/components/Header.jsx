@@ -1,13 +1,23 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const showReturn = location && location.pathname !== '/';
+
+  // 返回上一页；直接打开站内链接（首条记录没有上一页）时回首页兜底，避免跳出站点
+  const goBack = () => {
+    if (location.key === 'default') {
+      navigate('/');
+      return;
+    }
+    navigate(-1);
+  };
 
   return (
     <header className="topbar">
       {showReturn ? (
-        <NavLink to="/" className="topbar-return" aria-label="返回首页">
+        <button type="button" className="topbar-return" aria-label="返回" onClick={goBack}>
           <svg
             width="20"
             height="20"
@@ -22,9 +32,9 @@ export default function Header() {
           >
             <polyline points="15 18 9 12 15 6" />
           </svg>
-        </NavLink>
+        </button>
       ) : null}
-      <div className="brand">宿舍报修系统</div>
+      <div className="brand">报修系统</div>
     </header>
   );
 }

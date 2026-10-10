@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,6 +9,12 @@ import { migrateLegacyManagers, readManagers, removeCampusAccounts, renameCampus
 import { createManagerRoutes } from './managerRoutes.js';
 import { getSession as readStoredSession, removeSessions, saveSession } from './sessionStore.js';
 import { isAlnum } from './validation.js';
+import { DEFAULT_MODULES, normalizeModules, validateModules } from './modules.js';
+import { normalizeModuleLocations, renameCampusInLocations, validateModuleLocations } from './moduleLocations.js';
+import { createConfigTrash } from './recycle/configTrash.js';
+import { createTrashStore } from './recycle/trashStore.js';
+import { createTrashRoutes } from './recycle/trashRoutes.js';
+import { createRepairRoutes } from './repairs/repairsRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -104,16 +109,6 @@ app.post('/api/login', (req, res) => {
   return res.json({ success: true, token, ...session });
 });
 
-const storage = multer.diskStorage({
-  destination: (_, __, callback) => callback(null, uploadsDir),
-  filename: (_, file, callback) => {
-    const ext = path.extname(file.originalname) || '.jpg';
-    callback(null, `${Date.now()}-${uuidv4()}${ext}`);
-  },
-});
-
-const upload = multer({ storage });
-
 const readRepairs = () => {
   const raw = fs.readFileSync(dataFile, 'utf8');
   try {
@@ -136,22 +131,32 @@ const readConfig = () => {
       normalized[campus] = Array.isArray(value) ? value : defaultBuildings;
     });
     const buildings = [...new Set(Object.values(normalized).flat())];
+    // 报修模块：老配置没有该字段时返回默认模块（只在内存兜底，管理员保存配置时才落盘）
+    const modules = normalizeModules(parsed.modules);
     return {
       campuses,
       buildings,
       campusBuildings: normalized,
       // 忘记密码时提示学生联系的紧急联系电话，由管理员在后台维护
       emergencyPhone: typeof parsed.emergencyPhone === 'string' ? parsed.emergencyPhone : '',
+      modules,
+      // 各模块「具体地点」的选项（宿舍楼号在 campusBuildings；实验室/食堂/教室/办公室见此处，自定义模块为楼层）
+      moduleLocations: normalizeModuleLocations(parsed.moduleLocations, campuses, normalized, modules),
     };
   } catch {
+    const campuses = ['南校区', '北校区'];
+    const campusBuildings = {
+      南校区: ['1号楼', '2号楼', '3号楼', '4号楼'],
+      北校区: ['1号楼', '2号楼', '3号楼', '4号楼'],
+    };
+    const modules = DEFAULT_MODULES.map((item) => ({ ...item }));
     return {
-      campuses: ['南校区', '北校区'],
+      campuses,
       buildings: ['1号楼', '2号楼', '3号楼', '4号楼'],
-      campusBuildings: {
-        南校区: ['1号楼', '2号楼', '3号楼', '4号楼'],
-        北校区: ['1号楼', '2号楼', '3号楼', '4号楼']
-      },
+      campusBuildings,
       emergencyPhone: '',
+      modules,
+      moduleLocations: normalizeModuleLocations(null, campuses, campusBuildings, modules),
     };
   }
 };
@@ -164,26 +169,58 @@ const writeRepairs = (repairs) => {
   fs.writeFileSync(dataFile, JSON.stringify(repairs, null, 2), 'utf8');
 };
 
+/** 删除工单图片文件（仅回收站条目过期待清理时调用；保留期内不删，恢复后图片仍可用） */
+const deleteImageFile = (image) => {
+  if (!image) return;
+  const file = path.join(uploadsDir, path.basename(image));
+  if (fs.existsSync(file)) fs.unlinkSync(file);
+};
+
+// 回收站：所有删除先入站，保留期内可恢复，到期自动清理（条目不可手动删除）
+const trashStore = createTrashStore({
+  dataFile: path.join(dataDir, 'trash.json'),
+  onPurge: (item) => {
+    if (item.type === 'repair') deleteImageFile(item.payload?.record?.image);
+  },
+});
+const configTrash = createConfigTrash({ readConfig, writeConfig });
+const repairRoutes = createRepairRoutes({
+  uploadsDir,
+  readRepairs,
+  writeRepairs,
+  readConfig,
+  getSession,
+  isAdminReq,
+  trashStore,
+});
+
 app.get('/api/health', (_, res) => {
   res.json({ status: 'ok' });
 });
 
-app.get('/api/repairs', (req, res) => {
-  const session = getSession(req);
-  if (!session) {
-    return res.status(403).json({ error: '请先登录' });
-  }
+// 工单接口（含学生自助查询与追评反馈）：见 repairs/repairsRoutes.js
+app.use('/api/repairs', repairRoutes.router);
 
-  let repairs = readRepairs();
-  if (session.role === 'manager') {
-    // 宿管只能看到自己所在校区、自己楼号的工单
-    repairs = repairs.filter((item) => item.campus === session.campus && item.building === session.building);
-  }
-  return res.json(repairs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
-});
+// 宿管账号接口：按校区作用域化，数据按校区独立存取；删除账号时同步入回收站
+app.use(
+  '/api/managers',
+  createManagerRoutes({
+    isAdminReq,
+    readConfig,
+    dropSessionsOf,
+    recordDeletion: (campus, account) => trashStore.append([configTrash.captureManagerDeletion(campus, account)]),
+  }),
+);
 
-// 宿管账号接口：按校区作用域化，数据按校区独立存取
-app.use('/api/managers', createManagerRoutes({ isAdminReq, readConfig, dropSessionsOf }));
+// 回收站接口：查看 / 恢复 / 保留天数设置（仅管理员）
+app.use(
+  '/api/trash',
+  createTrashRoutes({
+    isAdminReq,
+    store: trashStore,
+    handlers: { ...configTrash.restoreHandlers, repair: repairRoutes.restoreRepair },
+  }),
+);
 
 app.get('/api/config', (req, res) => {
   res.json(readConfig());
@@ -191,7 +228,7 @@ app.get('/api/config', (req, res) => {
 
 app.post('/api/config', (req, res) => {
   if (!isAdminReq(req)) return res.status(403).json({ error: '仅限管理员操作' });
-  const { campuses, buildings, campusBuildings, campusRenames, emergencyPhone } = req.body || {};
+  const { campuses, buildings, campusBuildings, campusRenames, emergencyPhone, modules, moduleLocations } = req.body || {};
   const existing = readConfig();
 
   // 紧急联系电话：留空表示未设置，填写时必须是 11 位数字（登录页「忘记密码」会原样提示）
@@ -213,24 +250,55 @@ app.post('/api/config', (req, res) => {
     nextCampusBuildings[campus] = list.map((item) => String(item).trim()).filter(Boolean);
   });
 
+  // 报修模块：未传（老调用方）时保持原值，避免保存校区/楼号时把模块配置抹掉
+  const moduleResult = modules === undefined ? { modules: existing.modules } : validateModules(modules);
+  if (moduleResult.error) {
+    return res.status(400).json({ error: moduleResult.error });
+  }
+
+  // 账号数据按校区独立成文件，校区改名要跟着改文件名、删除校区要跟着删文件
+  const renames = (Array.isArray(campusRenames) ? campusRenames : [])
+    .map((item) => ({ from: String(item?.from || '').trim(), to: String(item?.to || '').trim() }))
+    .filter((item) => item.from && item.to && item.from !== item.to);
+
+  // 各模块地点选项：未传时保持原值；先跟随校区改名迁移键，再按最新校区列表对齐
+  // （新增校区补默认值、已删除校区移除），保证任何保存路径下结构与校区都一致
+  const locationResult =
+    moduleLocations === undefined ? { moduleLocations: existing.moduleLocations } : validateModuleLocations(moduleLocations);
+  if (locationResult.error) {
+    return res.status(400).json({ error: locationResult.error });
+  }
+  const renamedLocations = renames.reduce(
+    (list, item) => renameCampusInLocations(list, item.from, item.to),
+    locationResult.moduleLocations,
+  );
+  const nextModuleLocations = normalizeModuleLocations(
+    renamedLocations,
+    nextCampuses,
+    nextCampusBuildings,
+    moduleResult.modules,
+  );
+
   const nextBuildings = [...new Set(Object.values(nextCampusBuildings).flat())];
   const next = {
     campuses: nextCampuses,
     buildings: nextBuildings,
     campusBuildings: nextCampusBuildings,
     emergencyPhone: nextPhone,
+    modules: moduleResult.modules,
+    moduleLocations: nextModuleLocations,
   };
 
   if (!next.campuses.length || !nextBuildings.length) {
     return res.status(400).json({ error: '校区和楼号至少各保留一项' });
   }
 
+  // 保存前捕获被删除的内容（整校区/模块/楼号/地点选项），移入回收站以便误删后恢复
+  const removedEntries = configTrash.capture(existing, next, { actor: 'admin', renames });
+  if (removedEntries.length) trashStore.append(removedEntries);
+
   writeConfig(next);
 
-  // 账号数据按校区独立成文件，所以校区改名要跟着改文件名、删除校区要跟着删文件
-  const renames = (Array.isArray(campusRenames) ? campusRenames : [])
-    .map((item) => ({ from: String(item?.from || '').trim(), to: String(item?.to || '').trim() }))
-    .filter((item) => item.from && item.to && item.from !== item.to);
   renames.forEach((item) => renameCampusAccounts(item.from, item.to));
 
   const renamedFrom = new Set(renames.map((item) => item.from));
@@ -284,83 +352,6 @@ app.patch('/api/me/password', (req, res) => {
   return res.json({ success: true, message: '密码修改成功' });
 });
 
-app.post('/api/repairs', upload.single('image'), (req, res) => {
-  const { roomNumber, category, description, contact, name, building, campus } = req.body;
-
-  if (!roomNumber || !category || !description || !building || !campus) {
-    return res.status(400).json({ error: '缺少必要字段：校区、楼号、房间号、故障类型、描述不能为空' });
-  }
-
-  const repair = {
-    id: uuidv4(),
-    name: name || '',
-    campus: campus || '',
-    building: building || '',
-    roomNumber,
-    category,
-    description,
-    contact: contact || '',
-    status: '待处理',
-    createdAt: new Date().toISOString(),
-    image: req.file ? `/uploads/${req.file.filename}` : '',
-  };
-
-  const repairs = readRepairs();
-  repairs.unshift(repair);
-  writeRepairs(repairs);
-
-  res.status(201).json(repair);
-});
-
-app.patch('/api/repairs/:id', (req, res) => {
-  const session = getSession(req);
-  if (!session) {
-    return res.status(403).json({ error: '请先登录' });
-  }
-
-  const repairs = readRepairs();
-  const index = repairs.findIndex((item) => item.id === req.params.id);
-
-  if (index === -1) {
-    return res.status(404).json({ error: '未找到该报修记录' });
-  }
-
-  const target = repairs[index];
-  if (session.role === 'manager' && (target.campus !== session.campus || target.building !== session.building)) {
-    return res.status(403).json({ error: '只能处理本楼号的工单' });
-  }
-
-  repairs[index].status = '已处理';
-  writeRepairs(repairs);
-  res.json(repairs[index]);
-});
-
-app.delete('/api/repairs/:id', (req, res) => {
-  if (!isAdminReq(req)) {
-    return res.status(403).json({ error: '仅限管理员操作' });
-  }
-
-  const repairs = readRepairs();
-  const index = repairs.findIndex((item) => item.id === req.params.id);
-
-  if (index === -1) {
-    return res.status(404).json({ error: '未找到该报修记录' });
-  }
-
-  const target = repairs[index];
-  if (target.image) {
-    const imageFile = path.basename(target.image);
-    const imagePath = path.join(uploadsDir, imageFile);
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
-    }
-  }
-
-  repairs.splice(index, 1);
-  writeRepairs(repairs);
-  res.json({ success: true, message: '删除成功' });
-});
-
 app.listen(PORT, () => {
-  console.log(`宿舍报修后端已启动： http://localhost:${PORT}`);
+  console.log(`报修系统后端已启动： http://localhost:${PORT}`);
 });

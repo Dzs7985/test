@@ -1,25 +1,16 @@
-import { useBuildingAccounts } from '../../../hooks/useBuildingAccounts';
-import { useCampusConfig } from '../../../hooks/useCampusConfig';
-import { useManagers } from '../../../hooks/useManagers';
-import BuildingSettings from './BuildingSettings';
 import CampusSettings from './CampusSettings';
-import EmergencyPhoneSettings from './EmergencyPhoneSettings';
 
 /**
- * 管理员专属的校区 / 楼号 / 宿管账号配置区。
- * 这几个 hook 会调用管理员接口，宿管会话不会挂载这里，避免无谓的 403。
+ * 管理员「校区与模块设置」页里的校区部分：只负责校区增删改（当前校区）。
+ * 与「模块管理」合并在同一页里上下排列，因此保留小标题做区块分隔。
+ * 楼号、宿管账号与紧急联系电话已迁入「模块管理 → 宿舍报修」，本面板不再负责。
+ * campus（useCampusConfig）由 ManagersPanel 上提传入，与「模块管理」共用同一份配置状态。
  */
-export default function AdminConfigSections({ adminToken, session }) {
-  const campus = useCampusConfig(adminToken, session.notify, session.confirm);
-  const managers = useManagers(adminToken, campus.selectedCampus, session);
-  const buildingAccounts = useBuildingAccounts(campus, managers, session.notify, session.confirm);
-
+export default function AdminConfigSections({ campus }) {
   return (
     <>
-      <h3 style={{ marginTop: 0 }}>校区和楼号设置</h3>
+      <h3 style={{ marginTop: 0 }}>校区设置</h3>
       <CampusSettings campus={campus} />
-      <BuildingSettings campus={campus} buildingAccounts={buildingAccounts} />
-      <EmergencyPhoneSettings campus={campus} />
     </>
   );
 }

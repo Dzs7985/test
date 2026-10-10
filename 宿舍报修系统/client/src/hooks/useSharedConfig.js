@@ -30,6 +30,8 @@ export function useSharedConfig() {
         buildings: detail.buildings,
         campusBuildings: detail.campusBuildings,
         emergencyPhone: detail.emergencyPhone,
+        modules: detail.modules,
+        moduleLocations: detail.moduleLocations,
       });
       if (next) setConfig(next);
     };

@@ -11,6 +11,18 @@
   gap: 16px;
 }
 
+/* 某一级只有唯一选项时：自动带入并以只读文本展示，替代下拉框 */
+.field-static {
+  margin: 0;
+  width: 100%;
+  border: 2px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #f1f5f9;
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
 .image-placeholder,
 .repair-image {
   margin-top: 12px;
@@ -33,4 +45,148 @@
   border-style: solid;
   border-color: #93c5fd;
   background: #ffffff;
+}
+
+/* 报修提交成功弹窗：突出显示查询码（学生凭它或提交时的手机号在「查询进度」页自查） */
+.submit-success-dialog {
+  width: min(420px, 92vw);
+  text-align: left;
+}
+
+.submit-code-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 2px solid #bfdbfe;
+  border-radius: 12px;
+}
+
+.submit-code-label {
+  color: #1e3a8a;
+  font-weight: 700;
+}
+
+.query-code {
+  flex: 1;
+  padding: 4px 14px;
+  border-radius: 8px;
+  background: #166534;
+  color: #f0fdf4;
+  font-size: 1.25rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+.submit-code-copy {
+  border: 2px solid #93c5fd;
+  border-radius: 8px;
+  padding: 6px 12px;
+  background: #ffffff;
+  color: #1d4ed8;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.submit-code-copy:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.submit-code-tip {
+  margin: 10px 0 0;
+  color: #166534;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* 「去查询进度」是路由链接，按按钮样式对齐 */
+.submit-dialog-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* 学生入口的「查询报修进度」入口 */
+.query-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+/* 查询页：方式切换与查询表单 */
+.query-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.query-tabs button {
+  padding: 8px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #475569;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.query-tabs button.is-active {
+  border-color: transparent;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+.query-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.query-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.query-form input {
+  padding: 10px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.query-form .primary-btn {
+  align-self: flex-start;
+}
+
+.query-tip {
+  color: #166534;
+  font-weight: 600;
+}
+
+/* 追评反馈输入区（学生查询页） */
+.follow-up-form {
+  margin-top: 12px;
+}
+
+.follow-up-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font: inherit;
+  resize: vertical;
+}
+
+.follow-up-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
 }

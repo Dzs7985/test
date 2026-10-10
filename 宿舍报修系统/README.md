@@ -1,6 +1,6 @@
-# 宿舍报修系统
+# 报修系统
 
-基于 React + Vite + Tailwind CSS（前端）与 Node.js + Express + lowdb（后端）的宿舍报修网页应用。
+基于 React + Vite + Tailwind CSS（前端）与 Node.js + Express + lowdb（后端）的报修网页应用。
 
 ## 快速启动
 

@@ -1,52 +1,45 @@
-/* 管理后台：左侧主菜单布局、校区/楼号/宿管账号设置、校区选择器 */
+/* 管理后台：顶部横向标签页 + 下方内容区，整体在同一张卡片内 */
 
-/* 管理员后台：左侧主菜单（校区和楼号设置 / 报修工单管理）+ 右侧内容区 */
+/* 标签页与内容区上下排列（不再左右分栏） */
 .admin-layout {
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
-  gap: 20px;
-  align-items: start;
+  gap: 18px;
 }
 
-/* 深海蓝侧边菜单：强视觉锚点 */
+/* 顶部横向标签页：浅蓝分段控件，与内容同一张卡片 */
 .admin-menu {
-  display: grid;
-  gap: 10px;
-  padding: 14px;
-  border: 1px solid rgba(147, 197, 253, 0.35);
-  border-radius: 18px;
-  background: linear-gradient(165deg, #0b1e4a 0%, #12306e 55%, #16398a 100%);
-  box-shadow: 0 18px 40px rgba(11, 30, 74, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px;
+  border: 2px solid #dbeafe;
+  border-radius: 16px;
+  background: #eff6ff;
 }
 
 .admin-menu-item {
-  padding: 14px 16px;
+  flex: 1;
+  min-width: 0;
+  padding: 12px 18px;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: 11px;
   background: transparent;
-  color: rgba(239, 246, 255, 0.85);
+  color: #1e40af;
   font-size: 16px;
   font-weight: 700;
-  text-align: left;
-  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  text-align: center;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .admin-menu-item:hover {
-  background: rgba(96, 165, 250, 0.18);
-  color: #ffffff;
-  transform: translateX(4px);
+  background: #dbeafe;
 }
 
 .admin-menu-item.is-active {
   color: #ffffff;
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   border-color: rgba(147, 197, 253, 0.6);
-  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-
-/* 内容区首行标题不再需要额外上间距（原先用于分隔堆叠的区块） */
-.admin-content h3 {
-  margin-top: 0;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.35);
 }
 
 .search-box {

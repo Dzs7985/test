@@ -22,8 +22,9 @@ const appendLog = (text) => {
 /**
  * 宿管账号接口（仅管理员可操作）。全部按校区作用域化：
  * 账号数据按校区分开存储，接口必须带上 campus，因此不同校区可以存在同名账号。
+ * recordDeletion：账号删除时回调（回收站记录删除的账号，保留期内可恢复）。
  */
-export const createManagerRoutes = ({ isAdminReq, readConfig, dropSessionsOf }) => {
+export const createManagerRoutes = ({ isAdminReq, readConfig, dropSessionsOf, recordDeletion }) => {
   const router = express.Router();
 
   /** 从 query 取校区；缺失时直接回 400，避免误操作到别的校区。 */
@@ -94,6 +95,7 @@ export const createManagerRoutes = ({ isAdminReq, readConfig, dropSessionsOf }) 
     const removed = list.splice(index, 1)[0];
     writeManagers(campus, list);
     dropSessionsOf(campus, removed.username);
+    recordDeletion?.(campus, removed);
     appendLog(`DELETE campus=${campus} username=${removed.username}`);
     return res.json({ success: true });
   });

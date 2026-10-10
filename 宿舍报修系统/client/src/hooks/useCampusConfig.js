@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchConfig, normalizeConfig, saveConfig } from '../lib/api';
-import { defaultCampusOptions } from '../lib/constants';
+import { defaultCampusOptions, defaultModules } from '../lib/constants';
+import { DORM_MODULE_ID, findModule, newModuleId } from '../lib/modules';
 import { useListEditor } from './useListEditor';
 
 const syncEventName = 'dorm-config-sync';
@@ -27,15 +28,23 @@ const broadcastConfigSync = (config) => {
  * 校区与楼号配置（含选中校区切换、增删改、跨页面同步）。
  * confirm: 受控确认函数（useConfirm 提供，替代 window.confirm）。
  * 楼号不再是独立状态，而是由「选中校区」从 campusBuildings 派生，避免两份状态不同步。
+ * modules（报修模块）与校区/楼号共用同一份配置，模块管理页与校区设置因此不会各持一份。
  */
 export function useCampusConfig(adminToken, notify, confirm) {
   const [campuses, setCampuses] = useState([]);
   const [campusBuildings, setCampusBuildings] = useState({});
   // 忘记密码时提示学生联系的电话，与校区/楼号一起存在同一份配置里
   const [emergencyPhone, setEmergencyPhone] = useState('');
+  const [modules, setModules] = useState(defaultModules);
+  // 各模块「具体地点」的选项（管理员在「模块管理 → 地点设置」维护，学生表单按此渲染下拉）
+  const [moduleLocations, setModuleLocations] = useState({});
   const [selectedCampus, setSelectedCampus] = useState(defaultCampusOptions[0] || '');
   const campusEditor = useListEditor();
   const buildingEditor = useListEditor();
+  const moduleEditor = useListEditor();
+  // 保存串行化队列：连续快速操作（如连续拖拽排序）时，后一次保存排队等待前一次完成，
+  // 保证服务端按操作顺序落盘，避免并发请求导致写入顺序错乱
+  const saveQueueRef = useRef(Promise.resolve());
 
   const buildings = campusBuildings[selectedCampus] || [];
 
@@ -44,6 +53,8 @@ export function useCampusConfig(adminToken, notify, confirm) {
     setCampuses(config.campuses || []);
     setCampusBuildings(config.campusBuildings || {});
     setEmergencyPhone(config.emergencyPhone || '');
+    setModules(config.modules || defaultModules);
+    setModuleLocations(config.moduleLocations || {});
   }, []);
 
   const reload = useCallback(async () => {
@@ -62,7 +73,10 @@ export function useCampusConfig(adminToken, notify, confirm) {
 
   const persist = useCallback(
     async (nextConfig, successText) => {
-      const { ok, data } = await saveConfig(nextConfig, adminToken);
+      // 排队等待上一次保存结束再发出；上一次失败也要放行后续保存，避免队列中断
+      const save = saveQueueRef.current.then(() => saveConfig(nextConfig, adminToken));
+      saveQueueRef.current = save.catch(() => {});
+      const { ok, data } = await save;
       if (!ok) {
         notify(data.error || '保存失败', 'error');
         return false;
@@ -75,6 +89,8 @@ export function useCampusConfig(adminToken, notify, confirm) {
           buildings: normalized.buildings,
           campusBuildings: normalized.campusBuildings,
           emergencyPhone: normalized.emergencyPhone,
+          modules: normalized.modules,
+          moduleLocations: normalized.moduleLocations,
         });
       }
       if (successText) notify(successText, 'success');
@@ -112,7 +128,7 @@ export function useCampusConfig(adminToken, notify, confirm) {
       notify('校区至少保留一项', 'error');
       return false;
     }
-    const ok = await confirm(`删除后将无法恢复。是否确认删除校区 “${value}”？`, {
+    const ok = await confirm(`删除后校区及其楼号、宿管账号会移入回收站，可在保留期内恢复。是否确认删除校区 “${value}”？`, {
       title: '删除校区',
       confirmText: '删除',
       danger: true,
@@ -187,14 +203,96 @@ export function useCampusConfig(adminToken, notify, confirm) {
     );
   };
 
+  /** 模块操作只改 modules 数组，其余配置字段由服务端保持原值（与 emergencyPhone 相同的合并约定） */
+  const persistModules = (nextModules, successText) =>
+    persist({ campuses, campusBuildings, modules: nextModules }, successText);
+
+  /**
+   * 更新某模块的地点选项配置：「模块管理 → 地点设置」里的增删改都走这里。
+   * build 基于该模块当前配置返回新值；整份配置一次提交，配合保存队列保证落盘顺序。
+   */
+  const updateModuleLocation = (moduleId, build, successText) =>
+    persist(
+      {
+        campuses,
+        campusBuildings,
+        moduleLocations: { ...moduleLocations, [moduleId]: build(moduleLocations[moduleId] || {}) },
+      },
+      successText,
+    );
+
+  const addModule = async (name) => {
+    const value = (name || '').trim();
+    if (!value) return false;
+    if (modules.some((item) => item.name === value)) {
+      notify('模块已存在', 'error');
+      return false;
+    }
+    // 新增模块一律「具体地点」模式（仅管理员可见）；id 与名称解耦，重命名后保持稳定
+    return persistModules(
+      [...modules, { id: newModuleId(), name: value, enabled: true, locationMode: 'custom' }],
+      '模块添加成功',
+    );
+  };
+
+  /** 重命名模块（宿舍模块也允许改名，但不可删除） */
+  const saveModuleEdit = async () => {
+    const value = moduleEditor.value.trim();
+    const target = modules[moduleEditor.index];
+    if (!value || !target) return false;
+    if (modules.some((item) => item.id !== target.id && item.name === value)) {
+      notify('模块已存在', 'error');
+      return false;
+    }
+    const ok = await persistModules(
+      modules.map((item) => (item.id === target.id ? { ...item, name: value } : item)),
+      '模块修改成功',
+    );
+    if (ok) moduleEditor.cancel();
+    return ok;
+  };
+
+  /** 删除模块：宿舍报修不可删除；历史工单保留，后台仍可辨认（显示「已删除的模块」） */
+  const deleteModule = async (id) => {
+    const target = findModule({ modules }, id);
+    if (!target) return false;
+    if (id === DORM_MODULE_ID) {
+      notify('宿舍报修模块不可删除', 'error');
+      return false;
+    }
+    const ok = await confirm(`删除后学生入口不再显示「${target.name}」，历史工单仍会保留；模块与其地点设置会移入回收站，可在保留期内恢复。是否确认删除？`, {
+      title: '删除报修模块',
+      confirmText: '删除',
+      danger: true,
+    });
+    if (!ok) return false;
+    return persistModules(modules.filter((item) => item.id !== id), '模块删除成功');
+  };
+
+  /** 勾选启用/停用：只影响学生入口是否显示该模块 */
+  const toggleModule = (id, enabled) =>
+    persistModules(modules.map((item) => (item.id === id ? { ...item, enabled } : item)), '');
+
+  /** 拖拽/上下移换序：数据结构就是数组顺序，越界或原地不动直接忽略 */
+  const moveModule = async (from, to) => {
+    if (from === to || from < 0 || to < 0 || from >= modules.length || to >= modules.length) return false;
+    const nextModules = [...modules];
+    const [moved] = nextModules.splice(from, 1);
+    nextModules.splice(to, 0, moved);
+    return persistModules(nextModules, '模块顺序已更新');
+  };
+
   return {
     campuses,
     buildings,
     selectedCampus,
     emergencyPhone,
+    modules,
+    moduleLocations,
     setSelectedCampus,
     campusEditor,
     buildingEditor,
+    moduleEditor,
     addCampus,
     addBuildings,
     deleteCampus,
@@ -202,5 +300,11 @@ export function useCampusConfig(adminToken, notify, confirm) {
     saveCampusEdit,
     saveBuildingEdit,
     saveEmergencyPhone,
+    addModule,
+    saveModuleEdit,
+    deleteModule,
+    toggleModule,
+    moveModule,
+    updateModuleLocation,
   };
 }

@@ -1,38 +1,62 @@
 [
   {
-    "username": "dorm2",
-    "password": "WDx9h9pV",
-    "campus": "南校区",
-    "building": "2号楼"
-  },
-  {
-    "username": "dorm3",
-    "password": "cJ8zFz7u",
-    "campus": "南校区",
-    "building": "3号楼"
-  },
-  {
-    "username": "dorm4",
-    "password": "zgMkMJWu",
-    "campus": "南校区",
-    "building": "4号楼"
-  },
-  {
-    "username": "dorm5",
-    "password": "8DuD48Eq",
-    "campus": "南校区",
-    "building": "5号楼"
-  },
-  {
     "username": "dorm1",
     "password": "12345678",
     "campus": "南校区",
     "building": "1号楼"
   },
   {
+    "username": "dorm2",
+    "password": "12345678",
+    "campus": "南校区",
+    "building": "2号楼"
+  },
+  {
+    "username": "dorm3",
+    "password": "12345678",
+    "campus": "南校区",
+    "building": "3号楼"
+  },
+  {
+    "username": "dorm4",
+    "password": "12345678",
+    "campus": "南校区",
+    "building": "4号楼"
+  },
+  {
+    "username": "dorm5",
+    "password": "12345678",
+    "campus": "南校区",
+    "building": "5号楼"
+  },
+  {
     "username": "dorm6",
     "password": "12345678",
     "campus": "南校区",
     "building": "6号楼"
+  },
+  {
+    "username": "dorm7",
+    "password": "12345678",
+    "campus": "南校区",
+    "building": "7号楼"
+  },
+  {
+    "username": "dorm8",
+    "password": "12345678",
+    "campus": "南校区",
+    "building": "8号楼"
+  },
+  {
+    "username": "dorm9",
+    "password": "12345678",
+    "campus": "南校区",
+    "building": "9号楼"
+  },
+  {
+    "username": "dorm10",
+    "password": "12345678",
+    "campus": "南校区",
+    "building": "10号楼"
   }
 ]

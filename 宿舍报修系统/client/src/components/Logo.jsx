@@ -1,4 +1,4 @@
-/* 宿舍报修系统徽标：深蓝渐变圆角底 + 宿舍双楼剪影 + 维修齿轮 */
+/* 报修系统徽标：深蓝渐变圆角底 + 宿舍双楼剪影 + 维修齿轮 */
 const TEETH_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
 export default function Logo({ size = 64, className = '' }) {
@@ -9,7 +9,7 @@ export default function Logo({ size = 64, className = '' }) {
       viewBox="0 0 64 64"
       className={className}
       role="img"
-      aria-label="宿舍报修系统徽标"
+      aria-label="报修系统徽标"
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>

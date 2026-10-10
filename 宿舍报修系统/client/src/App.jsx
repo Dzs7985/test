@@ -4,6 +4,8 @@ import { useSharedConfig } from './hooks/useSharedConfig';
 import DormManagerPage from './pages/DormManagerPage';
 import HomePage from './pages/HomePage';
 import StudentPage from './pages/StudentPage';
+import StudentQueryPage from './pages/StudentQueryPage';
+import StudentRepairPage from './pages/StudentRepairPage';
 
 export default function App() {
   const { config } = useSharedConfig();
@@ -17,6 +19,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/student" element={<StudentPage config={config} />} />
+            <Route path="/student/query" element={<StudentQueryPage />} />
+            <Route path="/student/:moduleId" element={<StudentRepairPage config={config} />} />
             <Route path="/dorm-manager" element={<DormManagerPage config={config} />} />
           </Routes>
         </main>

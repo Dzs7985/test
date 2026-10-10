@@ -46,7 +46,7 @@ export default function LoginForm({
     <form onSubmit={handleSubmit} className="login-form">
       <div className="login-head">
         <Logo size={68} className="login-logo" />
-        <h2 className="login-title">宿舍报修系统</h2>
+        <h2 className="login-title">报修系统</h2>
         <p className="login-sub">宿管 / 管理员登录</p>
       </div>
 

@@ -98,7 +98,7 @@ export default function CampusSettings({ campus }) {
         flexDirection: 'column',
         alignItems: 'center',
         gap: 8,
-        marginBottom: 12,
+        marginBottom: 14,
       }}
     >
       <div className="campus-current-title">当前校区</div>

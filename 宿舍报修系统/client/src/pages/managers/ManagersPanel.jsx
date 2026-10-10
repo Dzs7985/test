@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import StatusToast from '../../components/StatusToast';
+import { useCampusConfig } from '../../hooks/useCampusConfig';
 import { useConfirm } from '../../hooks/useConfirm';
 import { useNotice } from '../../hooks/useNotice';
 import { useRepairs } from '../../hooks/useRepairs';
 import AdminConfigSections from './settings/AdminConfigSections';
+import ModuleSettings from './settings/ModuleSettings';
 import RepairsBoard from './RepairsBoard';
+import TrashPanel from './TrashPanel';
 import RepairsFilters, {
   applyRepairFilters,
   emptyRepairFilters,
@@ -13,28 +16,32 @@ import RepairsFilters, {
   normalizeFilters,
 } from './RepairsFilters';
 
-/** 左侧主菜单：点击切换右侧内容区显示哪一块 */
+/** 顶部标签页：点击切换下方内容区显示哪一块 */
 const menus = [
-  { key: 'config', label: '校区和楼号设置' },
+  { key: 'settings', label: '校区与模块设置' },
   { key: 'repairs', label: '报修工单管理' },
+  { key: 'trash', label: '回收站' },
 ];
 
 export default function ManagersPanel({ adminToken, config, onAuthLost }) {
   const { notice, notify, clearNotice } = useNotice();
   const { dialogProps, confirm, handleConfirm, handleCancel } = useConfirm();
-  const [activeMenu, setActiveMenu] = useState('config');
+  const [activeMenu, setActiveMenu] = useState('settings');
   const [filters, setFilters] = useState(emptyRepairFilters);
 
   const session = useMemo(() => ({ notify, confirm, onAuthLost }), [notify, confirm, onAuthLost]);
 
+  // 配置状态上提到这里：「校区设置」与「模块管理」共用同一份，避免各持一份导致模块列表不同步
+  const campus = useCampusConfig(adminToken, notify, confirm);
+
   // 管理员是唯一有删除权限的角色，显式开启（useRepairs 默认拒绝）
   const repairs = useRepairs(adminToken, { ...session, canDelete: true });
 
-  // 工单按校区 / 楼号 / 时间 / 状态筛选，只影响显示，不触发重新请求；选项与「校区和楼号设置」同步
+  // 工单按校区 / 模块 / 地点 / 时间 / 状态筛选，只影响显示，不触发重新请求；地点选项随模块变化，与「校区与模块设置」同步
   const activeFilters = useMemo(() => normalizeFilters(filters, config), [filters, config]);
   const visibleRecords = useMemo(
-    () => applyRepairFilters(repairs.records, activeFilters),
-    [repairs.records, activeFilters],
+    () => applyRepairFilters(repairs.records, activeFilters, config),
+    [repairs.records, activeFilters, config],
   );
 
   return (
@@ -57,13 +64,15 @@ export default function ManagersPanel({ adminToken, config, onAuthLost }) {
         </nav>
 
         <div className="admin-content">
-          {/* 两块内容都保持挂载、只切换显示：来回切菜单不会重新拉取配置和工单，未保存的编辑内容也不会丢 */}
-          <div hidden={activeMenu !== 'config'}>
-            <AdminConfigSections adminToken={adminToken} session={session} />
+          {/* 两块内容都保持挂载、只切换显示：来回切标签不会重新拉取配置和工单，未保存的编辑内容也不会丢 */}
+          <div hidden={activeMenu !== 'settings'}>
+            <AdminConfigSections campus={campus} />
+            <ModuleSettings campus={campus} adminToken={adminToken} session={session} />
           </div>
           <div hidden={activeMenu !== 'repairs'}>
             <RepairsBoard
               repairs={repairs}
+              config={config}
               records={visibleRecords}
               emptyText={hasActiveFilters(activeFilters) ? '没有符合筛选条件的工单' : '暂无报修工单'}
               toolbar={
@@ -77,6 +86,8 @@ export default function ManagersPanel({ adminToken, config, onAuthLost }) {
               }
             />
           </div>
+          {/* 回收站不常驻挂载：每次切进来都重新拉取，保证看到的是最新条目 */}
+          {activeMenu === 'trash' ? <TrashPanel adminToken={adminToken} session={session} /> : null}
         </div>
       </div>
 

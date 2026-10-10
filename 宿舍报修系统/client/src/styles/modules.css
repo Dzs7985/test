@@ -1,0 +1,391 @@
+/* 报修模块：学生入口的模块选择卡片 + 后台「模块管理」列表 */
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* 模块选择卡片：白底蓝边 + 悬浮上浮，与首页角色卡片同一视觉语言 */
+.module-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 20px;
+  border: 2px solid #dbeafe;
+  border-radius: 18px;
+  background: #ffffff;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 10px 24px rgba(29, 78, 216, 0.1);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  border-color: #2563eb;
+  box-shadow: 0 18px 38px rgba(29, 78, 216, 0.22);
+}
+
+.module-card strong {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0b1e4a;
+}
+
+.module-card small {
+  color: #475569;
+  line-height: 1.6;
+}
+
+/* 报修表单页头部：模块名 */
+.module-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.module-form-head h2 {
+  margin: 0;
+}
+
+/* 模块管理：说明、新增输入行、模块列表 */
+.module-hint {
+  margin: 0 0 14px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.module-add {
+  display: flex;
+  gap: 8px;
+  max-width: 420px;
+  margin-bottom: 14px;
+}
+
+.module-add input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 模块管理：左侧模块竖列 + 右侧设置详情 */
+.module-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.module-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.module-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 6px 10px;
+  border: 2px solid #bfdbfe;
+  border-radius: 12px;
+  background: #ffffff;
+  transition: border-color 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+}
+
+/* 拖拽中：原行半透明；目标行高亮，落点一目了然 */
+.module-row.is-dragging {
+  opacity: 0.5;
+}
+
+.module-row.is-drop-target {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+/* 左侧模块行：整行可点选，选中行高亮，右侧即为它的设置 */
+.module-row.is-selectable {
+  cursor: pointer;
+}
+
+.module-row.is-selected {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+/* 悬停反馈（选中行除外）：提示整行可点选 */
+.module-row.is-selectable:not(.is-selected):hover {
+  border-color: #93c5fd;
+}
+
+.drag-handle {
+  flex: none;
+  color: #93c5fd;
+  font-size: 18px;
+  cursor: grab;
+  user-select: none;
+}
+
+.module-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e40af;
+  white-space: nowrap;
+}
+
+/* 启用开关（方案 D）：勾选=蓝色滑块，取消勾选=灰色滑块；切换前有二次确认。
+   方向取反：未启用（默认）圆点停在右，启用时圆点滑到左 */
+.module-toggle input[type='checkbox'] {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 20px;
+  margin: 0;
+  border-radius: 999px;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.module-toggle input[type='checkbox']::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  /* 默认（未启用）：圆点在右侧 */
+  transform: translateX(18px);
+  transition: transform 0.18s ease;
+}
+
+.module-toggle input[type='checkbox']:checked {
+  background: #2563eb;
+}
+
+/* 启用：圆点取反到左侧 */
+.module-toggle input[type='checkbox']:checked::after {
+  transform: translateX(0);
+}
+
+/* 取消勾选（未启用）：整行淡化——文字与模块名、拖动柄都变浅灰 */
+.module-toggle.is-off {
+  color: #9ca3af;
+}
+
+.module-row.is-disabled .module-name {
+  color: #9ca3af;
+}
+
+.module-row.is-disabled .drag-handle {
+  color: #cbd5e1;
+}
+
+/* 模块名：既是名称也是选中按钮，呈现为纯文本 */
+.module-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 17px;
+  color: #0f172a;
+}
+
+.module-actions {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+
+/* 「更多 ⋯」菜单：修改/删除默认收起，点开后才显示 */
+.module-more {
+  position: relative;
+  flex: none;
+}
+
+.module-more-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  display: grid;
+  gap: 2px;
+  min-width: 128px;
+  padding: 6px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+.module-more-menu button {
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  font-size: 14px;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.module-more-menu button:hover {
+  background: #eff6ff;
+}
+
+.module-more-menu button.is-danger {
+  color: #dc2626;
+}
+
+.module-more-menu button.is-danger:hover {
+  background: #fef2f2;
+}
+
+.module-more-menu button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* 右侧设置详情：选中模块的地点设置与操作 */
+.module-detail {
+  padding: 16px;
+  border: 2px solid #dbeafe;
+  border-radius: 14px;
+  background: #f8fbff;
+}
+
+.module-detail-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: 40px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #bfdbfe;
+}
+
+.module-detail-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.module-detail-edit {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 不可用的小按钮（宿舍模块的删除、首行的上移等） */
+.mini-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* 地点选项块（楼号 / 实验室名称 / 食堂 / 层号）：一屏内多块时用卡片分隔 */
+.option-block {
+  margin-bottom: 14px;
+}
+
+.option-block:last-child {
+  margin-bottom: 0;
+}
+
+.option-block-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.option-add {
+  display: flex;
+  gap: 8px;
+  max-width: 420px;
+  margin-bottom: 8px;
+}
+
+.option-add input {
+  flex: 1;
+  min-width: 0;
+}
+
+.option-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 单个选项行：名称占满余下空间，操作按钮靠右 */
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 4px 8px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.option-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  color: #0f172a;
+}
+
+/* 楼号胶囊选择器（实验室名称 / 房间号按楼号细分时，先选楼号再维护选项） */
+.scope-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.scope-chip {
+  padding: 4px 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 13px;
+  color: #1d4ed8;
+  cursor: pointer;
+}
+
+.scope-chip.is-active {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
+}

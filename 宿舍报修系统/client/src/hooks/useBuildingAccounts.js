@@ -116,8 +116,8 @@ export function useBuildingAccounts(campus, managers, notify, confirm) {
 
   const removeBuildingWithAccount = async (value) => {
     const account = accountFor(value);
-    const extra = account ? `\n该楼号绑定的宿管账号 “${account.username}” 也会一并删除。` : '';
-    const ok = await confirm(`删除后将无法恢复。是否确认删除楼号 “${value}”？${extra}`, {
+    const extra = account ? `\n该楼号绑定的宿管账号 “${account.username}” 也会一并移入回收站。` : '';
+    const ok = await confirm(`删除后可在回收站保留期内恢复。是否确认删除楼号 “${value}”？${extra}`, {
       title: '删除楼号',
       confirmText: '删除',
       danger: true,

@@ -7,6 +7,13 @@
   }
 }
 
+/* 窄屏：模块竖列（260px）与右侧设置并排会过挤，改为上下堆叠 */
+@media (max-width: 760px) {
+  .module-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 @media (max-width: 700px) {
   .topbar {
     flex-direction: column;

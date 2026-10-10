@@ -1,24 +1,38 @@
+import { useState } from 'react';
 import { formatDateTime } from '../../lib/constants';
+import { formatRepairLocation } from '../../lib/locationOptions';
+import { DORM_MODULE_ID, findModule, moduleIdOf } from '../../lib/modules';
 
 /**
  * 工单看板：管理员与宿管共用。
  * 删除权限不在这里判断，直接沿用 repairs.canDelete（唯一来源，默认拒绝），
  * 避免界面与操作各判一次、出现「按钮可见但点击被拦」或反之。
- * records：管理员传入筛选后的列表；toolbar：标题下方的筛选栏等附加内容。
+ * records：管理员传入筛选后的列表；toolbar：标题下方的筛选栏等附加内容；
+ * title：看板标题，不传则不显示（管理员后台用顶部标签页导航，无需重复标题）；
+ * config：管理员传入（用于显示非宿舍模块的名称），宿管视图不传。
  */
 export default function RepairsBoard({
   repairs,
-  title = '报修工单管理',
+  title = '',
   records,
   emptyText = '暂无报修工单',
   toolbar = null,
+  config = null,
 }) {
   const { records: allRecords, loading, markHandled, removeRepair, canDelete } = repairs;
+  // 标记已处理时弹出的说明输入框：{ id, text }；说明会同步给学生自查页面
+  const [handling, setHandling] = useState(null);
   const list = records || allRecords;
+
+  const submitHandled = async () => {
+    if (!handling) return;
+    await markHandled(handling.id, handling.text);
+    setHandling(null);
+  };
 
   return (
     <div>
-      <h3 style={{ marginTop: 28 }}>{title}</h3>
+      {title ? <h3 style={{ marginTop: 28 }}>{title}</h3> : null}
       {toolbar}
 
       {loading ? <p className="empty">加载中…</p> : null}
@@ -26,8 +40,13 @@ export default function RepairsBoard({
 
       <div className="record-list">
         {list.map((item) => {
-          const location = [item.campus, item.building, item.roomNumber].filter(Boolean).join(' / ');
+          // 按记录里的地点字段展示：食堂/层号、楼号/实验室、具体地点或楼号/房间号（宿舍视图不依赖 config）
+          const location = formatRepairLocation(item);
+          // 宿舍模块不显示模块行（避免噪音）；模块被删除后历史工单仍可辨认
+          const moduleId = moduleIdOf(item);
+          const moduleName = moduleId === DORM_MODULE_ID ? '' : findModule(config, moduleId)?.name || '已删除的模块';
           const handled = item.status === '已处理';
+          const followUps = Array.isArray(item.followUps) ? item.followUps : [];
 
           return (
             <article key={item.id} className="record-card">
@@ -36,17 +55,32 @@ export default function RepairsBoard({
                 <span className={`status ${handled ? 'done' : 'pending'}`}>{handled ? '已处理' : '待处理'}</span>
               </div>
 
+              {moduleName ? <p>报修模块：{moduleName}</p> : null}
               <p>位置：{location || '—'}</p>
               <p>故障类型：{item.category || '—'}</p>
               <p>问题描述：{item.description || '—'}</p>
               <p>联系方式：{item.contact || '—'}</p>
               <p>提交时间：{formatDateTime(item.createdAt)}</p>
+              {item.feedback ? <p>处理说明：{item.feedback}</p> : null}
+
+              {followUps.length ? (
+                <div className="follow-ups">
+                  <p className="follow-ups-title">学生反馈（{followUps.length} 条）</p>
+                  {followUps.map((feedback) => (
+                    <p key={feedback.id} className="follow-up-item">
+                      <span className="follow-up-kind">{feedback.kind === 'urge' ? '催办' : '仍未解决'}</span>
+                      {feedback.text}
+                      <small>（{formatDateTime(feedback.at)}）</small>
+                    </p>
+                  ))}
+                </div>
+              ) : null}
 
               {item.image ? <img className="repair-image" src={item.image} alt="报修照片" /> : null}
 
               <div className="manager-actions">
                 {handled ? null : (
-                  <button type="button" onClick={() => markHandled(item.id)}>
+                  <button type="button" onClick={() => setHandling({ id: item.id, text: '' })}>
                     标记已处理
                   </button>
                 )}
@@ -60,6 +94,31 @@ export default function RepairsBoard({
           );
         })}
       </div>
+
+      {handling ? (
+        <div className="confirm-overlay" onClick={() => setHandling(null)} role="dialog" aria-modal="true">
+          <div className="confirm-dialog" onClick={(event) => event.stopPropagation()}>
+            <div className="confirm-title">标记已处理</div>
+            <p className="confirm-message">填写处理说明后，学生在自查页面可以看到状态与说明（可留空）。</p>
+            <textarea
+              className="handle-feedback"
+              rows="3"
+              maxLength={300}
+              value={handling.text}
+              placeholder="例：已更换损坏的灯管，如仍有问题可再次反馈"
+              onChange={(event) => setHandling({ ...handling, text: event.target.value })}
+            />
+            <div className="confirm-actions">
+              <button type="button" className="confirm-cancel" onClick={() => setHandling(null)}>
+                取消
+              </button>
+              <button type="button" className="confirm-ok" onClick={submitHandled}>
+                确认已处理
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

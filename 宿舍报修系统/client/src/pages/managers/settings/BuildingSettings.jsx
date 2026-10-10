@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import AlnumInput from '../../../components/AlnumInput';
 import { BUILDING_SUFFIX } from '../../../hooks/useBuildingAccounts';
 import { DEFAULT_INITIAL_PASSWORD } from '../../../lib/constants';
@@ -57,7 +57,7 @@ export default function BuildingSettings({ campus, buildingAccounts }) {
 
   return (
     <div className="config-card">
-      <h4>楼号</h4>
+      <h4>楼号与宿管账号</h4>
 
       <div className="building-layout">
         <div className="building-col">

@@ -7,6 +7,7 @@ import './styles/home.css';
 import './styles/admin.css';
 import './styles/repairs.css';
 import './styles/student.css';
+import './styles/modules.css';
 import './styles/login.css';
 import './styles/responsive.css';
 
