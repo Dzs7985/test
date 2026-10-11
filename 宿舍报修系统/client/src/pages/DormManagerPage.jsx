@@ -80,7 +80,7 @@ export default function DormManagerPage({ config }) {
   return (
     <div className="page">
       <StatusToast notice={notice} onClose={clearNotice} />
-      <section className="panel">
+      <section className={session ? 'panel' : 'panel login-card'}>
         {session ? (
           <div>
             {/* 账号相关的操作统一放在右上角：修改密码与登出并排 */}

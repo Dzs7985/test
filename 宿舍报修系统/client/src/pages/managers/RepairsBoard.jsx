@@ -51,7 +51,8 @@ export default function RepairsBoard({
           return (
             <article key={item.id} className="record-card">
               <div className="record-head">
-                <span>{item.name || '未填写姓名'}</span>
+                {/* 姓名为空时不显示占位文案（非宿舍模块不收集姓名），只保留右侧状态 */}
+                <span>{item.name || ''}</span>
                 <span className={`status ${handled ? 'done' : 'pending'}`}>{handled ? '已处理' : '待处理'}</span>
               </div>
 

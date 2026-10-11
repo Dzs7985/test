@@ -246,10 +246,12 @@ export const createRepairRoutes = ({ uploadsDir, readRepairs, writeRepairs, read
 
     const [target] = repairs.splice(index, 1);
     writeRepairs(repairs);
+    // 姓名为空时不写入占位文案（与工单卡片展示口径一致）
+    const owner = target.name ? `${target.name} · ` : '';
     trashStore.append([
       {
         type: 'repair',
-        label: `报修工单「${target.name || '未填写姓名'} · ${target.campus || ''} ${target.category || ''}」`,
+        label: `报修工单「${owner}${target.campus || ''} ${target.category || ''}」`,
         payload: { record: target },
         deletedBy: 'admin',
       },

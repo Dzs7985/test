@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
 import StatusToast from '../components/StatusToast';
 import { useNotice } from '../hooks/useNotice';
 import { claimLostItem, fetchLostItems } from '../lib/api';
@@ -139,7 +138,6 @@ export default function LostAndFoundPage() {
   return (
     <div className="page lost-page">
       <StatusToast notice={notice} onClose={clearNotice} />
-      <NavLink to="/" className="lost-back">← 返回首页</NavLink>
 
       <section className="panel">
         <h2>失物招领</h2>

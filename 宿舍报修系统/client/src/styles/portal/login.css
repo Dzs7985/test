@@ -1,7 +1,7 @@
 /* 登录页：品牌头部（logo + 标题）与表单布局；字段样式见 base.css，密码框两处共用 */
 
-/* 登录卡片：外层 section.panel 包含 login-form 时收窄居中，并带入场动画 */
-.panel:has(.login-form) {
+/* 登录卡片：外层 section.panel 带 login-card 类时收窄居中，并带入场动画（用显式类名替代 :has()，兼容旧浏览器） */
+.panel.login-card {
   max-width: 460px;
   margin: 0 auto;
   animation: login-card-in 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
