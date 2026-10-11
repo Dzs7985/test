@@ -1,4 +1,4 @@
-﻿﻿import { defaultCampusOptions, defaultBuildingOptions, defaultModules } from './constants';
+﻿﻿﻿﻿import { defaultCampusOptions, defaultBuildingOptions, defaultModules } from './constants';
 import { DORM_MODULE_ID } from './modules';
 
 const readJson = async (res, fallback = {}) => res.json().catch(() => fallback);
