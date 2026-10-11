@@ -1,0 +1,61 @@
+[
+  {
+    "id": "a7712b70-eaa1-4708-90cc-e6a05733fa9f",
+    "name": "耳机",
+    "description": "黑色",
+    "location": "实验室",
+    "image": "/uploads/lost-1791687780530-a646106e-d8b1-49ee-85f6-3dd10e545ed8.jpg",
+    "status": "待认领",
+    "createdAt": "2026-10-11T03:03:00.532Z",
+    "claims": [
+      {
+        "id": "7bbfd1ed-0608-410c-af8b-68a0de7406a5",
+        "name": "梁",
+        "contact": "12345678901",
+        "message": "1",
+        "claimCode": "681978",
+        "createdAt": "2026-10-11T03:03:29.299Z"
+      }
+    ]
+  },
+  {
+    "id": "bb40fb18-db7d-412a-8b93-cf7f8658d1be",
+    "name": "鼠标",
+    "description": "白色",
+    "location": "实验室",
+    "image": "/uploads/lost-1791687733343-6e9ec88d-10b7-4885-9417-ff848933aaa1.jpg",
+    "status": "待认领",
+    "createdAt": "2026-10-11T03:02:13.345Z",
+    "claims": [
+      {
+        "id": "57ff3ffc-673c-4603-8cfc-652bbbb55d81",
+        "name": "梁",
+        "contact": "12345678901",
+        "message": "1",
+        "claimCode": "420298",
+        "createdAt": "2026-10-11T03:03:47.875Z"
+      }
+    ]
+  },
+  {
+    "id": "60cb71f2-d1d7-4119-9418-cf4cb94d8021",
+    "name": "本子",
+    "description": "黑色",
+    "location": "实验室",
+    "image": "/uploads/lost-1791687026089-6dc9caca-dde4-4112-ace3-6337bd028d4c.jpg",
+    "status": "已认领",
+    "createdAt": "2026-10-11T02:50:26.091Z",
+    "claims": [
+      {
+        "id": "4cf82ca4-47af-45b8-beb8-45e5ba27fcb4",
+        "name": "梁",
+        "contact": "12345678901",
+        "message": "1",
+        "claimCode": "697122",
+        "createdAt": "2026-10-11T03:00:50.658Z"
+      }
+    ],
+    "claimedBy": "梁",
+    "claimedContact": "12345678901"
+  }
+]

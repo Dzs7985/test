@@ -9,6 +9,7 @@ import AdminConfigSections from './settings/AdminConfigSections';
 import ModuleSettings from './settings/ModuleSettings';
 import RepairsBoard from './RepairsBoard';
 import TrashPanel from './TrashPanel';
+import LostItemsPanel from './LostItemsPanel';
 import RepairsFilters, {
   applyRepairFilters,
   emptyRepairFilters,
@@ -20,6 +21,7 @@ import RepairsFilters, {
 const menus = [
   { key: 'settings', label: '校区与模块设置' },
   { key: 'repairs', label: '报修工单管理' },
+  { key: 'lostitems', label: '失物招领管理' },
   { key: 'trash', label: '回收站' },
 ];
 
@@ -87,6 +89,7 @@ export default function ManagersPanel({ adminToken, config, onAuthLost }) {
             />
           </div>
           {/* 回收站不常驻挂载：每次切进来都重新拉取，保证看到的是最新条目 */}
+          {activeMenu === 'lostitems' ? <LostItemsPanel /> : null}
           {activeMenu === 'trash' ? <TrashPanel adminToken={adminToken} session={session} /> : null}
         </div>
       </div>

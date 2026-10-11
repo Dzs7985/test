@@ -22,6 +22,12 @@ export default function HomePage() {
           <strong>工单管理</strong>
           <small>查看全部报修、标记已处理、删除异常记录</small>
         </NavLink>
+
+        <NavLink to="/lost-and-found" className="role-card lost-card-entry">
+          <span className="role-label">公共服务</span>
+          <strong>失物招领</strong>
+          <small>浏览拾获物品，看到自己丢失的东西可申请取回</small>
+        </NavLink>
       </div>
     </div>
   );

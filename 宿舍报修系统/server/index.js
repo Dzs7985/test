@@ -15,12 +15,14 @@ import { createConfigTrash } from './recycle/configTrash.js';
 import { createTrashStore } from './recycle/trashStore.js';
 import { createTrashRoutes } from './recycle/trashRoutes.js';
 import { createRepairRoutes } from './repairs/repairsRoutes.js';
+import { createLostItemRoutes } from './lostitems/lostItemsRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dataDir = path.join(__dirname, 'data');
 const uploadsDir = path.join(__dirname, 'uploads');
 const dataFile = path.join(dataDir, 'repairs.json');
+const lostItemsFile = path.join(dataDir, 'lostitems.json');
 const configFile = path.join(dataDir, 'config.json');
 
 if (!fs.existsSync(dataDir)) {
@@ -33,6 +35,9 @@ if (!fs.existsSync(uploadsDir)) {
 
 if (!fs.existsSync(dataFile)) {
   fs.writeFileSync(dataFile, '[]', 'utf8');
+}
+if (!fs.existsSync(lostItemsFile)) {
+  fs.writeFileSync(lostItemsFile, '[]', 'utf8');
 }
 if (!fs.existsSync(configFile)) {
   fs.writeFileSync(configFile, JSON.stringify({
@@ -200,6 +205,17 @@ app.get('/api/health', (_, res) => {
 
 // 工单接口（含学生自助查询与追评反馈）：见 repairs/repairsRoutes.js
 app.use('/api/repairs', repairRoutes.router);
+
+// 失物招领接口：管理员发布拾获物品，师生公开浏览并申请取回
+app.use(
+  '/api/lost-items',
+  createLostItemRoutes({
+    uploadsDir,
+    dataFile: lostItemsFile,
+    getSession,
+    isAdminReq,
+  }).router,
+);
 
 // 宿管账号接口：按校区作用域化，数据按校区独立存取；删除账号时同步入回收站
 app.use(

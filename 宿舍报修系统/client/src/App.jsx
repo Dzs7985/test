@@ -3,6 +3,7 @@ import Header from './components/Header';
 import { useSharedConfig } from './hooks/useSharedConfig';
 import DormManagerPage from './pages/DormManagerPage';
 import HomePage from './pages/HomePage';
+import LostAndFoundPage from './pages/LostAndFoundPage';
 import StudentPage from './pages/StudentPage';
 import StudentQueryPage from './pages/StudentQueryPage';
 import StudentRepairPage from './pages/StudentRepairPage';
@@ -18,6 +19,7 @@ export default function App() {
         <main className="main-content">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/lost-and-found" element={<LostAndFoundPage />} />
             <Route path="/student" element={<StudentPage config={config} />} />
             <Route path="/student/query" element={<StudentQueryPage />} />
             <Route path="/student/:moduleId" element={<StudentRepairPage config={config} />} />

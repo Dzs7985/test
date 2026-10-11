@@ -9,6 +9,7 @@ import './styles/repairs.css';
 import './styles/student.css';
 import './styles/modules.css';
 import './styles/login.css';
+import './styles/lostfound.css';
 import './styles/responsive.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(

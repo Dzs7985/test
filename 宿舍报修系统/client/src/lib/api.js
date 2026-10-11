@@ -262,3 +262,53 @@ export const submitRepair = async (formData) => {
   const res = await fetch('/api/repairs', { method: 'POST', body: formData });
   return { ok: res.ok, data: await readJson(res) };
 };
+
+/* ===================== 失物招领 ===================== */
+
+/** 公开列表：师生可直接浏览，无需登录 */
+export const fetchLostItems = async (token) => {
+  const headers = token ? tokenHeaders(token) : {};
+  const res = await fetch('/api/lost-items', { headers });
+  return { ok: res.ok, data: await readJson(res, []) };
+};
+
+/** 管理员发布拾获物品（带照片） */
+export const createLostItem = async (formData, token) => {
+  const res = await fetch('/api/lost-items', {
+    method: 'POST',
+    headers: tokenHeaders(token),
+    body: formData,
+  });
+  return { ok: res.ok, status: res.status, data: await readJson(res) };
+};
+
+/** 管理员更新物品状态（待认领 / 已认领）；标记已认领需携带学生认领密码 claimCode */
+export const updateLostItemStatus = async (id, status, token, claimCode) => {
+  const body = { status };
+  if (claimCode) body.claimCode = claimCode;
+  const res = await fetch(`/api/lost-items/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: tokenHeaders(token, jsonHeaders()),
+    body: JSON.stringify(body),
+  });
+  return { ok: res.ok, status: res.status, data: await readJson(res) };
+};
+
+/** 管理员删除物品 */
+export const deleteLostItem = async (id, token) => {
+  const res = await fetch(`/api/lost-items/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: tokenHeaders(token),
+  });
+  return { ok: res.ok, data: await readJson(res) };
+};
+
+/** 师生申请取回：姓名、11 位手机号、认领说明 */
+export const claimLostItem = async (id, payload) => {
+  const res = await fetch(`/api/lost-items/${encodeURIComponent(id)}/claim`, {
+    method: 'POST',
+    headers: jsonHeaders(),
+    body: JSON.stringify(payload),
+  });
+  return { ok: res.ok, status: res.status, data: await readJson(res) };
+};
