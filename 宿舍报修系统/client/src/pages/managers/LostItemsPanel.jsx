@@ -153,7 +153,7 @@ export default function LostItemsPanel() {
   };
 
   const handleDelete = async (item) => {
-    const ok = await confirm(`确认删除「${item.name}」？此操作不可恢复。`, {
+    const ok = await confirm(`确认删除「${item.name}」？会移入回收站，可在保留期内恢复。`, {
       title: '删除物品',
       confirmText: '删除',
       danger: true,
@@ -164,7 +164,7 @@ export default function LostItemsPanel() {
       notify(data?.error || '删除失败', 'error');
       return;
     }
-    notify('物品已删除', 'success');
+    notify('已移入回收站，可在回收站恢复', 'success');
     load();
   };
 

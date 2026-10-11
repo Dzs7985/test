@@ -3,7 +3,7 @@ import { fetchTrash, restoreTrashItem, saveTrashRetention } from '../../lib/api'
 import { formatDateTime } from '../../lib/constants';
 
 /** 条目类型 → 展示名 */
-const TYPE_LABELS = { repair: '工单', campus: '校区', module: '模块', manager: '宿管账号', option: '地点选项' };
+const TYPE_LABELS = { repair: '工单', campus: '校区', module: '模块', manager: '宿管账号', option: '地点选项', lostitem: '失物招领' };
 
 /** 剩余保留时间（按删除时间 + 保留天数计算），到期由服务端自动清理 */
 const remainText = (deletedAt, retentionDays) => {

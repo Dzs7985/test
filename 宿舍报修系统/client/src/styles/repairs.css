@@ -315,6 +315,7 @@
 .trash-type-module { background: #ede9fe; color: #6d28d9; }
 .trash-type-manager { background: #fef3c7; color: #b45309; }
 .trash-type-option { background: #cffafe; color: #0e7490; }
+.trash-type-lostitem { background: #fce7f3; color: #9d174d; }
 
 .trash-main {
   flex: 1;

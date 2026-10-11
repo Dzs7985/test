@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
  * 物品状态：待认领 →（收到申请后管理员核实）→ 已认领
  * 认领申请：公开提交，管理员在后台可看到申请人与联系方式。
  */
-export const createLostItemRoutes = ({ uploadsDir, dataFile, getSession, isAdminReq }) => {
+export const createLostItemRoutes = ({ uploadsDir, dataFile, getSession, isAdminReq, trashStore }) => {
   const readItems = () => {
     try {
       const raw = fs.readFileSync(dataFile, 'utf8');
@@ -21,12 +21,6 @@ export const createLostItemRoutes = ({ uploadsDir, dataFile, getSession, isAdmin
 
   const writeItems = (items) => {
     fs.writeFileSync(dataFile, JSON.stringify(items, null, 2), 'utf8');
-  };
-
-  const deleteImageFile = (image) => {
-    if (!image) return;
-    const file = path.join(uploadsDir, path.basename(image));
-    if (fs.existsSync(file)) fs.unlinkSync(file);
   };
 
   const storage = multer.diskStorage({
@@ -132,7 +126,7 @@ export const createLostItemRoutes = ({ uploadsDir, dataFile, getSession, isAdmin
     return res.json(items[index]);
   });
 
-  /** 管理员删除物品：同时清理图片文件 */
+  /** 管理员删除物品：移入回收站（图片保留到条目过期，恢复后仍可查看） */
   router.delete('/:id', (req, res) => {
     if (!isAdminReq(req)) {
       return res.status(403).json({ error: '仅限管理员操作' });
@@ -143,8 +137,15 @@ export const createLostItemRoutes = ({ uploadsDir, dataFile, getSession, isAdmin
 
     const [removed] = items.splice(index, 1);
     writeItems(items);
-    deleteImageFile(removed.image);
-    return res.json({ success: true, message: '物品已删除' });
+    trashStore.append([
+      {
+        type: 'lostitem',
+        label: `失物招领「${removed.name || '未命名物品'}」`,
+        payload: { item: removed },
+        deletedBy: 'admin',
+      },
+    ]);
+    return res.json({ success: true, message: '已移入回收站，可在回收站恢复' });
   });
 
   /** 师生申请取回：填写姓名、联系方式、认领说明 */
@@ -185,5 +186,16 @@ export const createLostItemRoutes = ({ uploadsDir, dataFile, getSession, isAdmin
     });
   });
 
-  return { router };
+  /** 回收站恢复：把条目里的物品原样放回列表 */
+  const restoreLostItem = (item) => {
+    const lost = item.payload?.item;
+    if (!lost?.id) return { error: '条目数据不完整' };
+    const items = readItems();
+    if (items.some((entry) => entry.id === lost.id)) return { message: '该物品已在列表中，无需恢复' };
+    items.unshift(lost);
+    writeItems(items);
+    return { message: '物品已恢复' };
+  };
+
+  return { router, restoreLostItem };
 };

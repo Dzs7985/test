@@ -207,7 +207,17 @@ const trashStore = createTrashStore({
   dataFile: path.join(dataDir, 'trash.json'),
   onPurge: (item) => {
     if (item.type === 'repair') deleteImageFile(item.payload?.record?.image);
+    if (item.type === 'lostitem') deleteImageFile(item.payload?.item?.image);
   },
+});
+
+// 失物招领：公开浏览 + 管理员发布/管理（路由实现见 lostitems/lostItemsRoutes.js）
+const lostItemRoutes = createLostItemRoutes({
+  uploadsDir,
+  dataFile: lostItemsFile,
+  getSession,
+  isAdminReq,
+  trashStore,
 });
 const configTrash = createConfigTrash({ readConfig, writeConfig });
 const repairRoutes = createRepairRoutes({
@@ -233,20 +243,16 @@ app.use(
   createTrashRoutes({
     isAdminReq,
     store: trashStore,
-    handlers: { ...configTrash.restoreHandlers, repair: repairRoutes.restoreRepair },
+    handlers: {
+      ...configTrash.restoreHandlers,
+      repair: repairRoutes.restoreRepair,
+      lostitem: lostItemRoutes.restoreLostItem,
+    },
   }),
 );
 
 // 失物招领：公开浏览 + 管理员发布/管理（路由实现见 lostitems/lostItemsRoutes.js）
-app.use(
-  '/api/lost-items',
-  createLostItemRoutes({
-    uploadsDir,
-    dataFile: lostItemsFile,
-    getSession,
-    isAdminReq,
-  }).router,
-);
+app.use('/api/lost-items', lostItemRoutes.router);
 
 // 宿管账号接口（仅管理员）：账号按校区分库，删除时入回收站，保留期内可恢复
 app.use(
