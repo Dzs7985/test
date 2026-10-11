@@ -62,8 +62,33 @@ textarea {
   font: inherit;
 }
 
+/* 按钮统一交互：为所有按钮补上平滑过渡（已单独定义 transition 的按钮沿用各自定义），
+   并给出统一的按下回弹、键盘焦点环、禁用态指针 */
 button {
   cursor: pointer;
+  transition:
+    transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+/* 按下反馈：轻微缩小、松开回弹。
+   排除两个靠 transform 定位的按钮：绝对居中的「显示密码」眼睛按钮、左上角返回按钮（缩放会破坏它们的居中，视觉上会「往下跳」） */
+button:not(.toggle-eye):not(.topbar-return):not(:disabled):active {
+  transform: scale(0.97);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* 键盘操作才显示焦点环，鼠标点击不出现，避免视觉噪音 */
+button:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
 }
 
 .app-shell {
@@ -238,11 +263,11 @@ select option[value=""] {
   color: rgba(31, 41, 55, 0.45);
 }
 
+/* 主按钮：仅保留蓝底渐变与悬停上浮、按下回弹，不加光泽扫过与发光阴影；
+   同时用作路由链接（如学生页「查询报修进度」），统一去掉下划线 */
 .primary-btn,
 .search-box button,
 .manager-actions button {
-  position: relative;
-  overflow: hidden;
   border: none;
   border-radius: 12px;
   padding: 13px 24px;
@@ -250,40 +275,20 @@ select option[value=""] {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1e40af 100%);
   font-weight: 700;
   letter-spacing: 0.04em;
-  box-shadow: 0 10px 22px rgba(29, 78, 216, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-/* 主按钮光泽扫过 */
-.primary-btn::after,
-.search-box button::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -80%;
-  width: 55%;
-  height: 100%;
-  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-  transform: skewX(-20deg);
-  transition: left 0.5s ease;
-}
-
-.primary-btn:hover::after,
-.search-box button:hover::after {
-  left: 130%;
+  text-decoration: none;
+  transition: transform 0.18s ease;
 }
 
 .primary-btn:hover,
 .search-box button:hover,
 .manager-actions button:not(:disabled):hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(29, 78, 216, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .primary-btn:active,
 .search-box button:active,
 .manager-actions button:not(:disabled):active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.97);
 }
 
 /* 次要按钮：白底蓝边蓝字，与蓝底主按钮「保存」区分开 */
@@ -301,6 +306,10 @@ select option[value=""] {
   border-color: #2563eb;
   background: #eff6ff;
   transform: translateY(-2px);
+}
+
+.secondary-btn:active {
+  transform: translateY(0) scale(0.97);
 }
 
 .message {
@@ -424,7 +433,6 @@ select option[value=""] {
   background: linear-gradient(135deg, #3b82f6, #1e40af);
   border-color: #1d4ed8;
   color: #ffffff;
-  box-shadow: 0 8px 18px rgba(29, 78, 216, 0.3);
 }
 
 .confirm-ok:hover {
@@ -473,4 +481,13 @@ select option[value=""] {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+  /* 与下方标签菜单栏留出间距：避免按钮光晕压住菜单栏、两者视觉上贴死 */
+  margin-bottom: 18px;
+}
+
+/* 系统开启「减少动态效果」时关闭装饰性脉冲动画（学生端进度节点） */
+@media (prefers-reduced-motion: reduce) {
+  .repair-steps li.is-current .step-dot::after {
+    animation: none;
+  }
 }

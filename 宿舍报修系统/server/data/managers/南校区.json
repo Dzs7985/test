@@ -24,12 +24,6 @@
     "building": "4号楼"
   },
   {
-    "username": "dorm5",
-    "password": "12345678",
-    "campus": "南校区",
-    "building": "5号楼"
-  },
-  {
     "username": "dorm6",
     "password": "12345678",
     "campus": "南校区",
@@ -52,11 +46,5 @@
     "password": "12345678",
     "campus": "南校区",
     "building": "9号楼"
-  },
-  {
-    "username": "dorm10",
-    "password": "12345678",
-    "campus": "南校区",
-    "building": "10号楼"
   }
 ]

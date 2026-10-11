@@ -6,7 +6,7 @@
   gap: 16px;
 }
 
-/* 模块选择卡片：白底蓝边 + 悬浮上浮，与首页角色卡片同一视觉语言 */
+/* 模块选择卡片：白底蓝边 + 悬浮微调，与首页角色卡片同一视觉语言（上浮幅度刻意保持轻微） */
 .module-card {
   display: flex;
   flex-direction: column;
@@ -22,9 +22,9 @@
 }
 
 .module-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   border-color: #2563eb;
-  box-shadow: 0 18px 38px rgba(29, 78, 216, 0.22);
+  box-shadow: 0 14px 30px rgba(29, 78, 216, 0.16);
 }
 
 .module-card strong {
@@ -85,6 +85,9 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  /* 作为各行的 offsetParent：行的 offsetTop 即「列表内坐标」，
+     拖拽落点与跟随位移都基于它计算，不受页面上其他定位元素影响 */
+  position: relative;
 }
 
 .module-row {
@@ -96,17 +99,38 @@
   border: 2px solid #bfdbfe;
   border-radius: 12px;
   background: #ffffff;
-  transition: border-color 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+  /* transform 过渡用于拖拽让位与松手落位：其余行实时平滑滑动，不生硬跳转 */
+  transition: border-color 0.18s ease, background 0.18s ease, opacity 0.18s ease,
+    box-shadow 0.18s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* 拖拽中：原行半透明；目标行高亮，落点一目了然 */
+/* 长按等待启动拖拽（约 0.24 秒）：边框微亮，提示拖拽即将开始 */
+.module-row.is-holding {
+  border-color: #93c5fd;
+  background: #f8fbff;
+}
+
+/* 拖拽中：被拖行上浮高亮，逐帧直接跟指针（禁用过渡才跟手）；
+   其余行由 .module-row 的 transform 过渡平滑让位。
+   不用投影阴影（逐帧重绘开销大，拖动会更卡） */
 .module-row.is-dragging {
-  opacity: 0.5;
+  position: relative;
+  z-index: 2;
+  border-color: #2563eb;
+  border-style: dashed;
+  background: #eff6ff;
+  will-change: transform;
+  transition: none;
 }
 
-.module-row.is-drop-target {
-  border-color: #2563eb;
-  background: #eff6ff;
+.module-row.is-dragging .drag-handle {
+  cursor: grabbing;
+}
+
+/* 拖拽期间：列表内禁止选中文字，光标统一为抓取中 */
+.module-list.is-drag-active {
+  cursor: grabbing;
+  user-select: none;
 }
 
 /* 左侧模块行：整行可点选，选中行高亮，右侧即为它的设置 */
@@ -130,6 +154,17 @@
   font-size: 18px;
   cursor: grab;
   user-select: none;
+  /* 触摸拖动时由脚本接管手势，不触发页面滚动 */
+  touch-action: none;
+  transition: color 0.18s ease;
+}
+
+.drag-handle:hover {
+  color: #2563eb;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
 }
 
 .module-toggle {
@@ -169,7 +204,8 @@
   background: #ffffff;
   /* 默认（未启用）：圆点在右侧 */
   transform: translateX(18px);
-  transition: transform 0.18s ease;
+  /* 轻微回弹的滑动，开关手感更顺滑 */
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .module-toggle input[type='checkbox']:checked {

@@ -10,6 +10,7 @@ import './styles/student.css';
 import './styles/modules.css';
 import './styles/portal/login.css';
 import './styles/portal/lostfound.css';
+import './styles/stats.css';
 import './styles/responsive.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(

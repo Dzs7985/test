@@ -10,6 +10,19 @@ const CODE_LENGTH = 6;
 const MAX_FOLLOW_UPS = 10;
 const MAX_FEEDBACK_LENGTH = 300;
 
+/**
+ * 工单状态两态模型：未完成 → 已完成。
+ * 历史数据里的「待处理 / 已处理 / 维修中」在读取时一律归一化
+ * （启动时一次性迁移落盘，见 index.js），其中「维修中」归入未完成。
+ */
+export const STATUS_PENDING = '未完成';
+export const STATUS_DONE = '已完成';
+const VALID_STATUSES = new Set([STATUS_PENDING, STATUS_DONE]);
+const LEGACY_STATUS = { 待处理: STATUS_PENDING, 已处理: STATUS_DONE, 维修中: STATUS_PENDING };
+
+export const normalizeStatus = (status) =>
+  VALID_STATUSES.has(status) ? status : LEGACY_STATUS[status] || STATUS_PENDING;
+
 const makeCode = (used) => {
   for (let attempt = 0; attempt < 30; attempt += 1) {
     let code = '';
@@ -38,7 +51,7 @@ const publicView = (item) => ({
   location: item.location || '',
   category: item.category || '',
   description: item.description || '',
-  status: item.status || '待处理',
+  status: normalizeStatus(item.status),
   createdAt: item.createdAt || '',
   feedback: item.feedback || '',
   handledAt: item.handledAt || '',
@@ -71,7 +84,7 @@ export const createRepairRoutes = ({ uploadsDir, readRepairs, writeRepairs, read
       return res.status(403).json({ error: '请先登录' });
     }
 
-    let repairs = readRepairs();
+    let repairs = readRepairs().map((item) => ({ ...item, status: normalizeStatus(item.status) }));
     if (session.role === 'manager') {
       // 宿管只能看到自己校区、自己楼号的「宿舍报修」工单：
       // 非宿舍模块（具体地点）工单仅管理员可见；校区/楼号为空串时也不能靠相等匹配放行
@@ -185,7 +198,7 @@ export const createRepairRoutes = ({ uploadsDir, readRepairs, writeRepairs, read
       category,
       description,
       contact: contact || '',
-      status: '待处理',
+      status: STATUS_PENDING,
       createdAt: new Date().toISOString(),
       image: req.file ? `/uploads/${req.file.filename}` : '',
     };
@@ -221,10 +234,18 @@ export const createRepairRoutes = ({ uploadsDir, readRepairs, writeRepairs, read
       }
     }
 
-    // 处理说明会展示给学生自查页面（可留空，最长 300 字）
-    const feedback = String(req.body?.feedback || '').trim().slice(0, MAX_FEEDBACK_LENGTH);
-    repairs[index].status = '已处理';
-    repairs[index].feedback = feedback;
+    // 状态流转：finish=标记完成（未完成 → 已完成，兼容无 body 的旧调用）
+    const action = String(req.body?.action || 'finish');
+    if (action !== 'finish') {
+      return res.status(400).json({ error: '不支持的操作' });
+    }
+    if (normalizeStatus(target.status) === STATUS_DONE) {
+      return res.status(400).json({ error: '该工单已是完成状态' });
+    }
+
+    repairs[index].status = STATUS_DONE;
+    // 标记完成时记录处理说明与处理人：说明会展示给学生自查页面（可留空，最长 300 字）
+    repairs[index].feedback = String(req.body?.feedback || '').trim().slice(0, MAX_FEEDBACK_LENGTH);
     repairs[index].handledAt = new Date().toISOString();
     repairs[index].handledBy = session.role === 'admin' ? '管理员' : `${session.campus} · ${session.username}`;
     writeRepairs(repairs);

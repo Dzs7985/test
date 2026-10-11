@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { formatDateTime } from '../../lib/constants';
+import { formatDateTime, normalizeRepairStatus, REPAIR_STATUS_CLASS } from '../../lib/constants';
 import { formatRepairLocation } from '../../lib/locationOptions';
 import { DORM_MODULE_ID, findModule, moduleIdOf } from '../../lib/modules';
 
@@ -8,8 +8,8 @@ import { DORM_MODULE_ID, findModule, moduleIdOf } from '../../lib/modules';
  * 删除权限不在这里判断，直接沿用 repairs.canDelete（唯一来源，默认拒绝），
  * 避免界面与操作各判一次、出现「按钮可见但点击被拦」或反之。
  * records：管理员传入筛选后的列表；toolbar：标题下方的筛选栏等附加内容；
- * title：看板标题，不传则不显示（管理员后台用顶部标签页导航，无需重复标题）；
  * config：管理员传入（用于显示非宿舍模块的名称），宿管视图不传。
+ * 状态流转：未完成 →（标记完成）→ 已完成（历史「维修中」统一显示为未完成）
  */
 export default function RepairsBoard({
   repairs,
@@ -19,14 +19,14 @@ export default function RepairsBoard({
   toolbar = null,
   config = null,
 }) {
-  const { records: allRecords, loading, markHandled, removeRepair, canDelete } = repairs;
-  // 标记已处理时弹出的说明输入框：{ id, text }；说明会同步给学生自查页面
+  const { records: allRecords, loading, finishRepair, removeRepair, canDelete } = repairs;
+  // 标记完成时弹出的说明输入框：{ id, text }；说明会同步给学生自查页面
   const [handling, setHandling] = useState(null);
   const list = records || allRecords;
 
   const submitHandled = async () => {
     if (!handling) return;
-    await markHandled(handling.id, handling.text);
+    await finishRepair(handling.id, handling.text);
     setHandling(null);
   };
 
@@ -45,7 +45,8 @@ export default function RepairsBoard({
           // 宿舍模块不显示模块行（避免噪音）；模块被删除后历史工单仍可辨认
           const moduleId = moduleIdOf(item);
           const moduleName = moduleId === DORM_MODULE_ID ? '' : findModule(config, moduleId)?.name || '已删除的模块';
-          const handled = item.status === '已处理';
+          const status = normalizeRepairStatus(item.status);
+          const done = status === '已完成';
           const followUps = Array.isArray(item.followUps) ? item.followUps : [];
 
           return (
@@ -53,7 +54,7 @@ export default function RepairsBoard({
               <div className="record-head">
                 {/* 姓名为空时不显示占位文案（非宿舍模块不收集姓名），只保留右侧状态 */}
                 <span>{item.name || ''}</span>
-                <span className={`status ${handled ? 'done' : 'pending'}`}>{handled ? '已处理' : '待处理'}</span>
+                <span className={`status ${REPAIR_STATUS_CLASS[status] || 'pending'}`}>{status}</span>
               </div>
 
               {moduleName ? <p>报修模块：{moduleName}</p> : null}
@@ -80,9 +81,9 @@ export default function RepairsBoard({
               {item.image ? <img className="repair-image" src={item.image} alt="报修照片" /> : null}
 
               <div className="manager-actions">
-                {handled ? null : (
+                {done ? null : (
                   <button type="button" onClick={() => setHandling({ id: item.id, text: '' })}>
-                    标记已处理
+                    标记完成
                   </button>
                 )}
                 {canDelete ? (
@@ -99,7 +100,7 @@ export default function RepairsBoard({
       {handling ? (
         <div className="confirm-overlay" onClick={() => setHandling(null)} role="dialog" aria-modal="true">
           <div className="confirm-dialog" onClick={(event) => event.stopPropagation()}>
-            <div className="confirm-title">标记已处理</div>
+            <div className="confirm-title">标记完成</div>
             <p className="confirm-message">填写处理说明后，学生在自查页面可以看到状态与说明（可留空）。</p>
             <textarea
               className="handle-feedback"
@@ -114,7 +115,7 @@ export default function RepairsBoard({
                 取消
               </button>
               <button type="button" className="confirm-ok" onClick={submitHandled}>
-                确认已处理
+                确认完成
               </button>
             </div>
           </div>

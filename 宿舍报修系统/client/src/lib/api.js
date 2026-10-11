@@ -1,4 +1,4 @@
-﻿﻿﻿﻿import { defaultCampusOptions, defaultBuildingOptions, defaultModules } from './constants';
+﻿﻿﻿import { defaultCampusOptions, defaultBuildingOptions, defaultModules } from './constants';
 import { DORM_MODULE_ID } from './modules';
 
 const readJson = async (res, fallback = {}) => res.json().catch(() => fallback);
@@ -184,11 +184,12 @@ export const fetchRepairs = async (token) => {
   return { ok: res.ok, status: res.status, data: await readJson(res, []) };
 };
 
-export const markRepairHandled = async (repairId, token, feedback) => {
+/** 更新工单状态：action='finish' 标记完成（未完成 → 已完成，可附文字处理说明） */
+export const updateRepairStatus = async (repairId, action, token, feedback = '') => {
   const res = await fetch(`/api/repairs/${repairId}`, {
     method: 'PATCH',
     headers: tokenHeaders(token, jsonHeaders()),
-    body: JSON.stringify({ feedback: feedback || '' }),
+    body: JSON.stringify({ action, feedback }),
   });
   return { ok: res.ok, data: await readJson(res) };
 };
@@ -258,9 +259,13 @@ export const changeOwnPassword = async (oldPassword, newPassword, token) => {
   return { ok: res.ok, data: await readJson(res) };
 };
 
+/** 学生提交报修（无需登录）：服务端生成查询码，提交成功后展示给学生留存 */
 export const submitRepair = async (formData) => {
-  const res = await fetch('/api/repairs', { method: 'POST', body: formData });
-  return { ok: res.ok, data: await readJson(res) };
+  const res = await fetch('/api/repairs', {
+    method: 'POST',
+    body: formData,
+  });
+  return { ok: res.ok, status: res.status, data: await readJson(res) };
 };
 
 /* ===================== 失物招领 ===================== */

@@ -1,7 +1,9 @@
 import { campusListOf } from '../../lib/locationOptions';
-import { findModule, moduleIdOf } from '../../lib/modules';
+import { findModule } from '../../lib/modules';
 
 /** 时间范围选项：按提交时间过滤 */
+import { normalizeRepairStatus, REPAIR_STATUS_DONE, REPAIR_STATUS_PENDING } from '../../lib/constants';
+
 const TIME_OPTIONS = [
   { value: 'all', label: '全部时间' },
   { value: 'today', label: '今天' },
@@ -14,11 +16,15 @@ const RANGE_DAYS = { today: 1, week: 7, month: 30 };
 
 const STATUS_OPTIONS = [
   { value: 'all', label: '全部状态' },
-  { value: 'pending', label: '待处理' },
-  { value: 'done', label: '已处理' },
+  { value: 'pending', label: REPAIR_STATUS_PENDING },
+  { value: 'done', label: REPAIR_STATUS_DONE },
 ];
 
-export const emptyRepairFilters = { campus: '', module: '', place: '', time: 'all', status: 'all' };
+/** 工单状态 → 筛选项值：比较基于状态常量而非展示文案，修改文案不会影响筛选逻辑 */
+const statusValueOf = (status) =>
+  normalizeRepairStatus(status) === REPAIR_STATUS_DONE ? 'done' : 'pending';
+
+export const emptyRepairFilters = { campus: '', building: '', time: 'all', status: 'all' };
 
 export const hasActiveFilters = (filters) =>
   Boolean(filters.campus || filters.module || filters.place) || filters.time !== 'all' || filters.status !== 'all';
@@ -68,11 +74,10 @@ export const applyRepairFilters = (records, filters, config) => {
   const placeField = filters.module && filters.place ? placeFieldOf(config, filters.module) : '';
   return records.filter((item) => {
     if (filters.campus && item.campus !== filters.campus) return false;
-    // 存量工单没有 module 字段，一律按宿舍报修处理（与看板的「报修模块」显示一致）
-    if (filters.module && moduleIdOf(item) !== filters.module) return false;
-    if (placeField && item[placeField] !== filters.place) return false;
-    if (filters.status === 'pending' && item.status === '已处理') return false;
-    if (filters.status === 'done' && item.status !== '已处理') return false;
+    if (filters.building && item.building !== filters.building) return false;
+    if (filters.status !== 'all' && statusValueOf(item.status) !== filters.status) {
+      return false;
+    }
     if (from) {
       const created = new Date(item.createdAt).getTime();
       if (!(created >= from)) return false;
@@ -86,8 +91,9 @@ export const applyRepairFilters = (records, filters, config) => {
  * 模块决定下一级「地点」的名称与选项：宿舍/实验室/教室/办公室 → 楼号，食堂 → 食堂名，
  * 自定义模块 → 楼层；选项来源与报修表单一致（按所选校区维护）；
  * 校区与模块都选定后「地点」才能选择（与报修表单「先选上一级」的规则一致）。
+ * lockedStatus：从看板跳转到「未完成 / 已完成」列表页时为 true，状态由页面固定，不再显示状态下拉。
  */
-export default function RepairsFilters({ records, config, filters, onChange, matched }) {
+export default function RepairsFilters({ config, filters, onChange, lockedStatus = false }) {
   const campuses = config?.campuses || [];
   const modules = config?.modules || [];
 
@@ -155,21 +161,20 @@ export default function RepairsFilters({ records, config, filters, onChange, mat
         </select>
       </label>
 
-      <label className="filter-field">
-        状态
-        <select value={filters.status} onChange={(event) => change('status', event.target.value)}>
-          {STATUS_OPTIONS.map((item) => (
-            <option key={item.value} value={item.value}>
-              {item.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      {lockedStatus ? null : (
+        <label className="filter-field">
+          状态
+          <select value={filters.status} onChange={(event) => change('status', event.target.value)}>
+            {STATUS_OPTIONS.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <div className="filter-actions">
-        <span className="filter-summary">
-          显示 {matched} / {records.length} 条
-        </span>
         {hasActiveFilters(filters) ? (
           <button type="button" className="mini-action" onClick={() => onChange(emptyRepairFilters)}>
             重置

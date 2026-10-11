@@ -12,7 +12,7 @@ export default function HomePage() {
 
       <div className="role-grid">
         <NavLink to="/student" className="role-card">
-          <span className="role-label">学生入口</span>
+          <span className="role-label">报修入口</span>
           <strong>报修申请</strong>
           <small>选择报修类型、填写位置并上传照片</small>
         </NavLink>

@@ -118,9 +118,9 @@
 }
 
 .role-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-2px);
   border-color: #2563eb;
-  box-shadow: 0 26px 50px rgba(29, 78, 216, 0.28);
+  box-shadow: 0 14px 30px rgba(29, 78, 216, 0.18);
 }
 
 .role-card:hover::after {

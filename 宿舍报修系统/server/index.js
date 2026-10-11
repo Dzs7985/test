@@ -14,7 +14,7 @@ import { normalizeModuleLocations, renameCampusInLocations, validateModuleLocati
 import { createConfigTrash } from './recycle/configTrash.js';
 import { createTrashStore } from './recycle/trashStore.js';
 import { createTrashRoutes } from './recycle/trashRoutes.js';
-import { createRepairRoutes } from './repairs/repairsRoutes.js';
+import { createRepairRoutes, normalizeStatus } from './repairs/repairsRoutes.js';
 import { createLostItemRoutes } from './lostitems/lostItemsRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -48,6 +48,27 @@ if (!fs.existsSync(configFile)) {
 
 // 历史数据：旧的单一 managers.json 按校区拆分到 data/managers/<校区>.json
 migrateLegacyManagers();
+
+// 工单状态两态模型（未完成 → 已完成）与归一化规则定义在 repairs/repairsRoutes.js；
+// 历史工单里的「待处理 / 已处理 / 维修中」读取时已归一化，这里在启动时一次性迁移落盘。
+(() => {
+  let repairs = [];
+  try {
+    repairs = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+  } catch {
+    repairs = [];
+  }
+  if (!Array.isArray(repairs)) return;
+  let changed = false;
+  repairs.forEach((item) => {
+    const next = normalizeStatus(item.status);
+    if (next !== item.status) {
+      item.status = next;
+      changed = true;
+    }
+  });
+  if (changed) fs.writeFileSync(dataFile, JSON.stringify(repairs, null, 2), 'utf8');
+})();
 
 const app = express();
 const PORT = 3001;
@@ -203,10 +224,20 @@ app.get('/api/health', (_, res) => {
   res.json({ status: 'ok' });
 });
 
-// 工单接口（含学生自助查询与追评反馈）：见 repairs/repairsRoutes.js
+// 工单接口（提交 / 列表 / 三态流转 / 删除入回收站 / 学生自助查询与追评）见 repairs/repairsRoutes.js
 app.use('/api/repairs', repairRoutes.router);
 
-// 失物招领接口：管理员发布拾获物品，师生公开浏览并申请取回
+// 回收站接口：查看 / 恢复 / 保留天数设置（仅管理员）
+app.use(
+  '/api/trash',
+  createTrashRoutes({
+    isAdminReq,
+    store: trashStore,
+    handlers: { ...configTrash.restoreHandlers, repair: repairRoutes.restoreRepair },
+  }),
+);
+
+// 失物招领：公开浏览 + 管理员发布/管理（路由实现见 lostitems/lostItemsRoutes.js）
 app.use(
   '/api/lost-items',
   createLostItemRoutes({
@@ -217,24 +248,15 @@ app.use(
   }).router,
 );
 
-// 宿管账号接口：按校区作用域化，数据按校区独立存取；删除账号时同步入回收站
+// 宿管账号接口（仅管理员）：账号按校区分库，删除时入回收站，保留期内可恢复
 app.use(
   '/api/managers',
   createManagerRoutes({
     isAdminReq,
     readConfig,
     dropSessionsOf,
-    recordDeletion: (campus, account) => trashStore.append([configTrash.captureManagerDeletion(campus, account)]),
-  }),
-);
-
-// 回收站接口：查看 / 恢复 / 保留天数设置（仅管理员）
-app.use(
-  '/api/trash',
-  createTrashRoutes({
-    isAdminReq,
-    store: trashStore,
-    handlers: { ...configTrash.restoreHandlers, repair: repairRoutes.restoreRepair },
+    recordDeletion: (campus, account) =>
+      trashStore.append([configTrash.captureManagerDeletion(campus, account)]),
   }),
 );
 

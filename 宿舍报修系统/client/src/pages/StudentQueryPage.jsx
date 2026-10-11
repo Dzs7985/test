@@ -1,7 +1,28 @@
 import { useState } from 'react';
 import { queryRepairByCode, queryRepairsByContact, submitRepairFollowUp } from '../lib/api';
-import { formatDateTime } from '../lib/constants';
+import { formatDateTime, normalizeRepairStatus, REPAIR_STATUS_CLASS } from '../lib/constants';
 import { formatRepairLocation } from '../lib/locationOptions';
+
+const STEPS = ['未完成', '已完成'];
+
+/** 两步进度条：让学生一眼看到工单处于未完成还是已完成（样式见 styles/student.css） */
+function RepairSteps({ status }) {
+  const current = STEPS.indexOf(status);
+  return (
+    <ol className="repair-steps">
+      {STEPS.map((step, index) => (
+        <li
+          key={step}
+          className={(index <= current ? 'is-active' : '') + (index === current ? ' is-current' : '')}
+        >
+          {index > 0 ? <span className="step-line" /> : null}
+          <span className="step-dot">{index + 1}</span>
+          {step}
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 /**
  * 学生自查页（无需账号）：两种查询方式——
@@ -134,19 +155,22 @@ export default function StudentQueryPage() {
         {records && records.length > 0 ? (
           <div className="record-list">
             {records.map((item) => {
-              const handled = item.status === '已处理';
+              const status = normalizeRepairStatus(item.status);
+              const done = status === '已完成';
               const followUps = Array.isArray(item.followUps) ? item.followUps : [];
               return (
                 <article key={item.id} className="record-card">
                   <div className="record-head">
                     <span>{formatRepairLocation(item) || '—'}</span>
-                    <span className={`status ${handled ? 'done' : 'pending'}`}>{handled ? '已处理' : '待处理'}</span>
+                    <span className={`status ${REPAIR_STATUS_CLASS[status] || 'pending'}`}>{status}</span>
                   </div>
+
+                  <RepairSteps status={status} />
 
                   <p>故障类型：{item.category || '—'}</p>
                   <p>问题描述：{item.description || '—'}</p>
                   <p>提交时间：{formatDateTime(item.createdAt)}</p>
-                  {handled ? (
+                  {done ? (
                     <>
                       <p>处理时间：{formatDateTime(item.handledAt)}</p>
                       <p>处理说明：{item.feedback || '管理员未填写说明'}</p>
@@ -172,14 +196,14 @@ export default function StudentQueryPage() {
                         rows="2"
                         maxLength={200}
                         value={noteText}
-                        placeholder={handled ? '问题仍未解决？说明具体情况，管理员会看到' : '还没处理？可说明情况催办'}
+                        placeholder={done ? '问题仍未解决？说明具体情况，管理员会看到' : '还没处理？可说明情况催办'}
                         onChange={(event) => setNoteText(event.target.value)}
                       />
                       <div className="follow-up-actions">
                         <button type="button" className="confirm-cancel" onClick={() => setNoteFor('')}>
                           取消
                         </button>
-                        <button type="button" onClick={() => sendFollowUp(item, handled ? 'unsolved' : 'urge')}>
+                        <button type="button" onClick={() => sendFollowUp(item, done ? 'unsolved' : 'urge')}>
                           提交反馈
                         </button>
                       </div>
@@ -187,7 +211,7 @@ export default function StudentQueryPage() {
                   ) : (
                     <div className="manager-actions">
                       <button type="button" onClick={() => { setNoteFor(item.id); setNoteText(''); setError(''); }}>
-                        {handled ? '问题仍未解决' : '仍未处理，我要反馈'}
+                        {done ? '问题仍未解决' : '仍未处理，我要反馈'}
                       </button>
                     </div>
                   )}

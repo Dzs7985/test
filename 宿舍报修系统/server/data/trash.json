@@ -1,4 +1,332 @@
 {
   "retentionDays": 7,
-  "items": []
+  "items": [
+    {
+      "id": "c87646a1-0bc6-4b97-b99f-322030e26fff",
+      "deletedAt": "2026-10-11T09:37:20.218Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 5号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "5号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "462da4b7-25c1-478c-8396-68235013b870",
+      "deletedAt": "2026-10-11T09:37:20.207Z",
+      "type": "manager",
+      "label": "宿管账号「dorm5」（南校区 · 5号楼）",
+      "payload": {
+        "campus": "南校区",
+        "account": {
+          "username": "dorm5",
+          "password": "12345678",
+          "campus": "南校区",
+          "building": "5号楼"
+        }
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "52e6cf11-1088-454b-9930-0a3949db1858",
+      "deletedAt": "2026-10-11T09:37:14.315Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 10号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "10号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "c9ec63b0-a65d-42c1-b048-6b95a4b5c628",
+      "deletedAt": "2026-10-11T09:37:14.304Z",
+      "type": "manager",
+      "label": "宿管账号「dorm10」（南校区 · 10号楼）",
+      "payload": {
+        "campus": "南校区",
+        "account": {
+          "username": "dorm10",
+          "password": "12345678",
+          "campus": "南校区",
+          "building": "10号楼"
+        }
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "f2ea3adb-7f90-411b-ab62-c57688e7ab0f",
+      "deletedAt": "2026-10-11T09:35:15.102Z",
+      "type": "option",
+      "label": "实验室报修 · 实验室名称「123 / 2号楼 / 计算机实验室」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusLabs",
+        "campus": "123",
+        "building": "2号楼",
+        "value": "计算机实验室"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "25ad27ab-5468-49d3-bff2-85bc7e1f104f",
+      "deletedAt": "2026-10-11T09:34:11.905Z",
+      "type": "option",
+      "label": "实验室报修 · 楼号「北校区 / 6号楼」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusBuildings",
+        "campus": "北校区",
+        "value": "6号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "2212589d-a7d2-4754-b564-8a666026e65f",
+      "deletedAt": "2026-10-11T09:34:11.905Z",
+      "type": "option",
+      "label": "实验室报修 · 实验室名称「北校区 / 6号楼 / 物理实验室」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusLabs",
+        "campus": "北校区",
+        "building": "6号楼",
+        "value": "物理实验室"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "3d019cfc-3f87-418f-9421-d657c97f0919",
+      "deletedAt": "2026-10-11T09:34:11.905Z",
+      "type": "option",
+      "label": "实验室报修 · 实验室名称「北校区 / 6号楼 / 化学实验室」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusLabs",
+        "campus": "北校区",
+        "building": "6号楼",
+        "value": "化学实验室"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "c6eeeec0-2b96-468f-ad1c-25a30dd6a5fc",
+      "deletedAt": "2026-10-11T09:34:11.905Z",
+      "type": "option",
+      "label": "实验室报修 · 实验室名称「北校区 / 6号楼 / 生物实验室」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusLabs",
+        "campus": "北校区",
+        "building": "6号楼",
+        "value": "生物实验室"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "2f701500-6436-443e-924d-93a379935ac4",
+      "deletedAt": "2026-10-11T09:34:11.905Z",
+      "type": "option",
+      "label": "实验室报修 · 实验室名称「北校区 / 6号楼 / 计算机实验室」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusLabs",
+        "campus": "北校区",
+        "building": "6号楼",
+        "value": "计算机实验室"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "ce37a580-5f99-44d0-a471-925bb8f7ac6e",
+      "deletedAt": "2026-10-11T09:34:08.664Z",
+      "type": "option",
+      "label": "实验室报修 · 楼号「北校区 / 7号楼」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusBuildings",
+        "campus": "北校区",
+        "value": "7号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "9c414193-81e1-4edd-ad91-37c0d98b42a4",
+      "deletedAt": "2026-10-11T09:34:08.664Z",
+      "type": "option",
+      "label": "实验室报修 · 实验室名称「北校区 / 7号楼 / 物理实验室」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusLabs",
+        "campus": "北校区",
+        "building": "7号楼",
+        "value": "物理实验室"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "3e76a4e1-3e18-451d-8392-d8190271d5f3",
+      "deletedAt": "2026-10-11T09:34:08.664Z",
+      "type": "option",
+      "label": "实验室报修 · 实验室名称「北校区 / 7号楼 / 化学实验室」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusLabs",
+        "campus": "北校区",
+        "building": "7号楼",
+        "value": "化学实验室"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "129c00f9-a1f4-4f7d-8fdd-bec2ed80f464",
+      "deletedAt": "2026-10-11T09:34:08.664Z",
+      "type": "option",
+      "label": "实验室报修 · 实验室名称「北校区 / 7号楼 / 生物实验室」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusLabs",
+        "campus": "北校区",
+        "building": "7号楼",
+        "value": "生物实验室"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "1b1327e9-fc05-48b6-9b2a-33692301a401",
+      "deletedAt": "2026-10-11T09:34:08.664Z",
+      "type": "option",
+      "label": "实验室报修 · 实验室名称「北校区 / 7号楼 / 计算机实验室」",
+      "payload": {
+        "moduleId": "lab",
+        "group": "campusLabs",
+        "campus": "北校区",
+        "building": "7号楼",
+        "value": "计算机实验室"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "5962f77f-ea73-4083-9c32-a42dfa51ae78",
+      "deletedAt": "2026-10-11T09:25:41.275Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 9号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "9号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "80d57afc-a639-45aa-88f6-e2bae18f6997",
+      "deletedAt": "2026-10-11T09:25:40.266Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 8号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "8号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "5a904e32-f78c-4eb8-995c-3535eba5c87c",
+      "deletedAt": "2026-10-11T09:25:39.198Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 7号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "7号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "b700d7f8-498f-415b-8eb4-63b9ec236632",
+      "deletedAt": "2026-10-11T09:25:38.006Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 6号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "6号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "49cdf717-eb5b-4bae-bd0b-dd94daee3b61",
+      "deletedAt": "2026-10-11T09:25:36.564Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 5号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "5号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "3e56985e-80bb-4cf3-a9c9-9734e73bb328",
+      "deletedAt": "2026-10-11T09:25:35.317Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 4号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "4号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "314fb0ca-407a-4b0b-af8b-38101eca8a69",
+      "deletedAt": "2026-10-11T09:25:33.786Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 3号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "3号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "d54ffaf6-3ac7-495e-ae98-650110bd58db",
+      "deletedAt": "2026-10-11T09:25:27.236Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 2号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "2号楼"
+      },
+      "deletedBy": "admin"
+    },
+    {
+      "id": "efc48706-2009-413c-842d-d6c2c261080f",
+      "deletedAt": "2026-10-11T09:25:25.782Z",
+      "type": "option",
+      "label": "宿舍楼号「南校区 / 1号楼」",
+      "payload": {
+        "moduleId": "",
+        "group": "campusBuildings",
+        "campus": "南校区",
+        "value": "1号楼"
+      },
+      "deletedBy": "admin"
+    }
+  ]
 }

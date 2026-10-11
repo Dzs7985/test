@@ -121,19 +121,19 @@ export const createManagerRoutes = ({ isAdminReq, readConfig, dropSessionsOf, re
     const index = list.findIndex((item) => item.username === username);
     if (index === -1) return res.status(404).json({ error: '未找到该宿管账号' });
 
-    let student = list[index];
+    let manager = list[index];
 
     if (newUsername && newUsername !== username) {
       if (list.some((item) => item.username === newUsername)) {
         return res.status(409).json({ error: '本校区已存在同名账号' });
       }
-      student.username = newUsername;
+      manager.username = newUsername;
       appendLog(`RENAME campus=${campus} from=${username} to=${newUsername}`);
     }
 
     if (password) {
-      student.password = password;
-      appendLog(`UPDATE PASSWORD campus=${campus} username=${student.username}`);
+      manager.password = password;
+      appendLog(`UPDATE PASSWORD campus=${campus} username=${manager.username}`);
     }
 
     if (building !== undefined) {
@@ -141,16 +141,16 @@ export const createManagerRoutes = ({ isAdminReq, readConfig, dropSessionsOf, re
       if (target && list.some((item, i) => i !== index && item.building === target)) {
         return res.status(409).json({ error: '该楼号已绑定宿管账号' });
       }
-      if (target !== (student.building || '')) {
-        student.building = target;
-        appendLog(`BIND BUILDING campus=${campus} username=${student.username} building=${target}`);
+      if (target !== (manager.building || '')) {
+        manager.building = target;
+        appendLog(`BIND BUILDING campus=${campus} username=${manager.username} building=${target}`);
       }
     }
 
     writeManagers(campus, list);
     // 改名或改密后，让旧的登录态立即失效
-    if (password || student.username !== username) dropSessionsOf(campus, username);
-    return res.json({ success: true, campus, username: student.username, building: student.building || '' });
+    if (password || manager.username !== username) dropSessionsOf(campus, username);
+    return res.json({ success: true, campus, username: manager.username, building: manager.building || '' });
   });
 
   return router;

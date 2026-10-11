@@ -260,7 +260,7 @@ export function useCampusConfig(adminToken, notify, confirm) {
       notify('宿舍报修模块不可删除', 'error');
       return false;
     }
-    const ok = await confirm(`删除后学生入口不再显示「${target.name}」，历史工单仍会保留；模块与其地点设置会移入回收站，可在保留期内恢复。是否确认删除？`, {
+    const ok = await confirm(`删除后报修入口不再显示「${target.name}」，历史工单仍会保留；模块与其地点设置会移入回收站，可在保留期内恢复。是否确认删除？`, {
       title: '删除报修模块',
       confirmText: '删除',
       danger: true,
@@ -269,16 +269,25 @@ export function useCampusConfig(adminToken, notify, confirm) {
     return persistModules(modules.filter((item) => item.id !== id), '模块删除成功');
   };
 
-  /** 勾选启用/停用：只影响学生入口是否显示该模块 */
-  const toggleModule = (id, enabled) =>
-    persistModules(modules.map((item) => (item.id === id ? { ...item, enabled } : item)), '');
+  /** 勾选启用/停用：只影响报修入口是否显示该模块。
+      切换后立即按「启用在前、未启用在后」重排并保存：停用的模块确认后自动移到底部，
+      启用则回到启用段末尾，与列表「未启用固定沉底」的规则一致（不等刷新） */
+  const toggleModule = (id, enabled) => {
+    const toggled = modules.map((item) => (item.id === id ? { ...item, enabled } : item));
+    const nextModules = [
+      ...toggled.filter((item) => item.enabled),
+      ...toggled.filter((item) => !item.enabled),
+    ];
+    return persistModules(nextModules, '');
+  };
 
-  /** 拖拽/上下移换序：数据结构就是数组顺序，越界或原地不动直接忽略 */
-  const moveModule = async (from, to) => {
-    if (from === to || from < 0 || to < 0 || from >= modules.length || to >= modules.length) return false;
-    const nextModules = [...modules];
-    const [moved] = nextModules.splice(from, 1);
-    nextModules.splice(to, 0, moved);
+  /** 拖拽排序：按给定 id 顺序整体保存。不做 from/to 索引运算——
+      保存队列在途时连续拖拽会拿到旧数组算错落点，按 id 快照重排则始终正确 */
+  const reorderModules = (orderedIds) => {
+    const byId = new Map(modules.map((item) => [item.id, item]));
+    const nextModules = orderedIds.map((id) => byId.get(id)).filter(Boolean);
+    if (nextModules.length !== modules.length) return false;
+    if (nextModules.every((item, index) => item.id === modules[index].id)) return false;
     return persistModules(nextModules, '模块顺序已更新');
   };
 
@@ -304,7 +313,7 @@ export function useCampusConfig(adminToken, notify, confirm) {
     saveModuleEdit,
     deleteModule,
     toggleModule,
-    moveModule,
+    reorderModules,
     updateModuleLocation,
   };
 }

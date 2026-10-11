@@ -40,18 +40,12 @@
   margin-left: auto;
 }
 
-.filter-summary {
-  color: #1d4ed8;
-  font-size: 14px;
-  font-weight: 700;
-}
-
 .record-list {
   display: grid;
   gap: 18px;
 }
 
-/* 工单卡片：白底 + 左侧蓝色竖条 + hover 蓝边发光 */
+/* 工单卡片：白底 + 左侧蓝色竖条；hover 只微调边框与阴影，不做浮动位移 */
 .record-card {
   position: relative;
   border: 2px solid #dbeafe;
@@ -59,7 +53,7 @@
   background: #ffffff;
   padding: 20px 20px 20px 24px;
   box-shadow: 0 10px 26px rgba(29, 78, 216, 0.09);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .record-card::before {
@@ -75,8 +69,7 @@
 
 .record-card:hover {
   border-color: #60a5fa;
-  transform: translateY(-3px);
-  box-shadow: 0 18px 38px rgba(29, 78, 216, 0.2);
+  box-shadow: 0 12px 30px rgba(29, 78, 216, 0.16);
 }
 
 .record-head {
@@ -95,11 +88,12 @@
   color: #475569;
 }
 
-/* 状态徽章：加大加边框，保持黄/绿语义色 */
+/* 状态徽章：两态用「颜色 + 图标 + 边框样式」三重区分，一眼可辨（管理端看板 / 宿管面板 / 学生自查共用） */
 .status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 0.78rem;
@@ -108,16 +102,44 @@
   border: 2px solid transparent;
 }
 
-.status.pending {
-  background: #fef3c7;
-  color: #92400e;
-  border-color: #fcd34d;
+/* 状态图标：未完成=空心圈（等待中）、已完成=对勾 */
+.status::before {
+  content: '';
+  flex: none;
+  box-sizing: border-box;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
 }
 
+/* 未完成：琥珀色 + 虚线边框 + 空心圈，读作「待处理、尚未开始」 */
+.status.pending {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #f59e0b;
+  border-style: dashed;
+}
+
+.status.pending::before {
+  background: #ffffff;
+  border: 2px solid #f59e0b;
+}
+
+/* 已完成：绿色 + 对勾 */
 .status.done {
   background: #dcfce7;
   color: #166534;
-  border-color: #86efac;
+  border-color: #22c55e;
+}
+
+.status.done::before {
+  content: '✓';
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  color: #16a34a;
+  font-size: 0.85rem;
+  line-height: 1;
 }
 
 .manager-card {

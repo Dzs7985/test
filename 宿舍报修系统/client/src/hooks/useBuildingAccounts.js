@@ -62,16 +62,25 @@ export function useBuildingAccounts(campus, managers, notify, confirm) {
     for (const item of created) await deleteAccount(item.username);
   };
 
-  const summaryText = (created, skipped) => {
+  const summaryText = (added, created) => {
+    const parts = [];
+    if (added.length) parts.push(`新增 ${added.length} 个楼号`);
+    if (created.length) parts.push(`生成 ${created.length} 个宿管账号`);
+    if (!parts.length) return '这些楼号都已存在';
     const detail = created.map((item) => `${item.building}：${item.username}/${item.password}`).join('、');
-    const body = created.length <= DETAIL_LIMIT ? ` —— ${detail}` : `，初始密码均为 ${created[0].password}，点楼号可在右侧查看`;
-    return `已生成 ${created.length} 个楼号及账号${body}${skipped ? `（已跳过 ${skipped} 个已存在的楼号）` : ''}`;
+    const body = !created.length
+      ? '（账号已就绪）'
+      : created.length <= DETAIL_LIMIT
+        ? ` —— ${detail}`
+        : `，初始密码均为 ${created[0].password}，点楼号可在右侧查看`;
+    return `${parts.join('、')}${body}`;
   };
 
   /**
-   * 一键生成一段楼号（如 1 到 5 → 1号楼…5号楼；只填「由」则只建一个楼号），并为每个新楼号建账号。
+   * 一键生成一段楼号（如 1 到 5 → 1号楼…5号楼；只填「由」则只建一个楼号），
+   * 并保证每个楼号都有宿管账号：缺账号的楼号（含「楼号已存在但没账号」与历史遗留账号）在此补建或复用。
    * 先建账号再保存楼号：中途失败就把已建账号删掉，不会留下挂不到楼号的账号。
-   * 成功返回新增的楼号列表（供界面选中第一个）。
+   * 成功返回可选的楼号列表（供界面选中第一个）。
    */
   const addBuildingsWithAccounts = async (startText, endText) => {
     const start = Number(startText);
@@ -88,30 +97,35 @@ export function useBuildingAccounts(campus, managers, notify, confirm) {
 
     const names = buildRange(start, end);
     const added = names.filter((item) => !buildings.includes(item));
-    if (!added.length) {
-      notify('这些楼号都已存在', 'error');
-      return null;
-    }
-
     const taken = [...list];
     const created = [];
-    for (const building of added) {
+    for (const building of names) {
+      // 该楼号已有账号（含历史遗留、楼号暂不在列表里的账号）直接复用：
+      // 楼号补回后绑定即恢复 1:1，不再被「该楼号已绑定宿管账号」挡住
+      if (taken.some((item) => item.building === building)) continue;
       const account = await createAccount(building, taken);
       if (!account) {
         await rollbackAccounts(created);
         return null;
       }
-      taken.push({ username: account.username });
+      taken.push({ username: account.username, building });
       created.push(account);
     }
 
-    const ok = await addBuildings(added);
-    if (!ok) {
-      await rollbackAccounts(created);
+    if (!added.length && !created.length) {
+      notify('这些楼号都已存在', 'error');
       return null;
     }
-    notify(summaryText(created, names.length - added.length), 'success');
-    return added;
+
+    if (added.length) {
+      const ok = await addBuildings(added);
+      if (!ok) {
+        await rollbackAccounts(created);
+        return null;
+      }
+    }
+    notify(summaryText(added, created), 'success');
+    return added.length ? added : names.slice(0, 1);
   };
 
   const removeBuildingWithAccount = async (value) => {

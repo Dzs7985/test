@@ -190,3 +190,105 @@
   gap: 10px;
   margin-top: 8px;
 }
+
+/* 两步进度条（学生查询页）：未完成 → 已完成 */
+.repair-steps {
+  display: flex;
+  align-items: center;
+  margin: 4px 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.repair-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.step-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 800;
+  flex: none;
+}
+
+/* 连线画在当前节点左侧：节点点亮时它到上一节点的连线才变蓝 */
+.step-line {
+  width: 28px;
+  height: 3px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  margin-right: 2px;
+}
+
+.repair-steps li.is-active {
+  color: #1d4ed8;
+}
+
+.repair-steps li.is-active .step-dot {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.35);
+}
+
+.repair-steps li.is-active .step-line {
+  background: #93c5fd;
+}
+
+/* 终态（已完成）节点用绿色区分 */
+.repair-steps li:last-child.is-active .step-dot {
+  background: linear-gradient(135deg, #34d399, #059669);
+  box-shadow: 0 4px 10px rgba(5, 150, 105, 0.35);
+}
+
+/* 当前所处节点：外圈脉冲扩散，一眼看出进度停在哪一步（未完成=蓝、已完成=绿） */
+.repair-steps li.is-current .step-dot {
+  position: relative;
+}
+
+.repair-steps li.is-current .step-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid #2563eb;
+  animation: step-dot-ring 1.6s ease-out infinite;
+}
+
+.repair-steps li:last-child.is-current .step-dot::after {
+  border-color: #059669;
+}
+
+@keyframes step-dot-ring {
+  0% { transform: scale(0.8); opacity: 0.9; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* 窄屏：进度条改为纵向 */
+@media (max-width: 620px) {
+  .repair-steps {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .repair-steps li {
+    padding-right: 0;
+  }
+
+  .step-line {
+    display: none;
+  }
+}
